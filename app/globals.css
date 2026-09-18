@@ -1,26 +1,326 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
+
+/* ==========================================================================
+   BabyNest Design System
+   Single source of truth for color, type, spacing, radius and shadow tokens.
+   Brand direction: modern, premium, warm, elegant, trustworthy — playful but
+   not childish, and never "all pink". Inspired by the BabyNest Home Page
+   reference (blush/rose hero, cream background, violet AI accent).
+   ========================================================================== */
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --font-heading: var(--font-sans);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+
+  /* Distinct AI visual language — used by Smart Search, the Shopping
+     Assistant, and AI recommendation rails. Same brand, different accent. */
+  --color-ai: var(--ai);
+  --color-ai-foreground: var(--ai-foreground);
+  --color-ai-muted: var(--ai-muted);
+  --color-ai-muted-foreground: var(--ai-muted-foreground);
+  --color-ai-border: var(--ai-border);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Radius scale — one base token drives every corner in the app. */
+  --radius-sm: calc(var(--radius) * 0.55);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-button: 999px;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+:root {
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* ---- Core surfaces ---- */
+  --background: #fff8f5; /* warm ivory, faint blush undertone */
+  --foreground: #2b2024; /* warm near-black, not pure black */
+  --card: #ffffff;
+  --card-foreground: #2b2024;
+  --popover: #ffffff;
+  --popover-foreground: #2b2024;
+
+  /* ---- Primary: dusty rose, the BabyNest signature color ---- */
+  --primary: #db5e76;
+  --primary-foreground: #ffffff;
+  --primary-hover: #c24862;
+
+  /* ---- Secondary / accent: warm peach, used sparingly ---- */
+  --secondary: #fbeadd;
+  --secondary-foreground: #7a4b2e;
+
+  --muted: #f6ede9;
+  --muted-foreground: #7c6a6e;
+
+  --accent: #fce4e8; /* soft blush — hover / selected tint */
+  --accent-foreground: #b23f58;
+
+  /* ---- Semantic status ---- */
+  --destructive: #dc2626;
+  --destructive-foreground: #ffffff;
+  --success: #2f9e5b;
+  --success-foreground: #ffffff;
+  --warning: #e3922e;
+  --warning-foreground: #2b2024;
+
+  /* ---- AI accent: soft indigo/violet, distinct from commerce chrome ---- */
+  --ai: #7c6ae8;
+  --ai-foreground: #ffffff;
+  --ai-muted: #f1eefc;
+  --ai-muted-foreground: #5b4bc4;
+  --ai-border: #ddd6f7;
+
+  --border: #ede1dd;
+  --input: #ede1dd;
+  --ring: #db5e76;
+
+  --chart-1: #db5e76;
+  --chart-2: #7c6ae8;
+  --chart-3: #e3922e;
+  --chart-4: #2f9e5b;
+  --chart-5: #7a4b2e;
+
+  /* Base corner radius — cards/inputs/dialogs derive from this. Buttons use
+     --radius-button (pill) directly, independent of this scale. */
+  --radius: 0.85rem;
+
+  --sidebar: #fffaf8;
+  --sidebar-foreground: #2b2024;
+  --sidebar-primary: #db5e76;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #fce4e8;
+  --sidebar-accent-foreground: #b23f58;
+  --sidebar-border: #ede1dd;
+  --sidebar-ring: #db5e76;
+}
+
+.dark {
+  --background: #221a1d;
+  --foreground: #f7ece9;
+  --card: #2b2226;
+  --card-foreground: #f7ece9;
+  --popover: #2b2226;
+  --popover-foreground: #f7ece9;
+
+  --primary: #ea7b90;
+  --primary-foreground: #24141a;
+  --primary-hover: #f296a7;
+
+  --secondary: #3a2c27;
+  --secondary-foreground: #f3d9bf;
+
+  --muted: #362a2d;
+  --muted-foreground: #b7a3a6;
+
+  --accent: #3d262d;
+  --accent-foreground: #f0a9b8;
+
+  --destructive: #f16464;
+  --destructive-foreground: #24141a;
+  --success: #4bb97b;
+  --success-foreground: #0f2318;
+  --warning: #eaa94f;
+  --warning-foreground: #2b2024;
+
+  --ai: #9d8ff2;
+  --ai-foreground: #1c1533;
+  --ai-muted: #2c2540;
+  --ai-muted-foreground: #c6bcf7;
+  --ai-border: #453a63;
+
+  --border: #3c2f32;
+  --input: #3c2f32;
+  --ring: #ea7b90;
+
+  --chart-1: #ea7b90;
+  --chart-2: #9d8ff2;
+  --chart-3: #eaa94f;
+  --chart-4: #4bb97b;
+  --chart-5: #f3d9bf;
+
+  --sidebar: #241b1e;
+  --sidebar-foreground: #f7ece9;
+  --sidebar-primary: #ea7b90;
+  --sidebar-primary-foreground: #24141a;
+  --sidebar-accent: #3d262d;
+  --sidebar-accent-foreground: #f0a9b8;
+  --sidebar-border: #3c2f32;
+  --sidebar-ring: #ea7b90;
+}
+
+/* ==========================================================================
+   Shadows — soft, warm-tinted elevation instead of default flat-black
+   Tailwind shadows. Overriding Tailwind's own --shadow-* theme keys means
+   every existing shadow-sm/md/lg/xl utility (ours and shadcn's) picks this
+   up automatically, no new class names required.
+   ========================================================================== */
+@theme {
+  --shadow-xs: 0 1px 2px 0 rgb(43 24 24 / 0.04);
+  --shadow-sm: 0 2px 8px -2px rgb(43 24 24 / 0.07), 0 1px 2px -1px rgb(43 24 24 / 0.04);
+  --shadow-md: 0 8px 24px -4px rgb(43 24 24 / 0.09), 0 2px 6px -2px rgb(43 24 24 / 0.05);
+  --shadow-lg: 0 20px 40px -8px rgb(43 24 24 / 0.12), 0 6px 12px -4px rgb(43 24 24 / 0.06);
+  --shadow-xl: 0 28px 56px -12px rgb(43 24 24 / 0.16), 0 10px 20px -6px rgb(43 24 24 / 0.08);
+
+  /* Elevated, violet-tinted shadow reserved for AI surfaces. */
+  --shadow-ai: 0 12px 32px -8px rgb(124 106 232 / 0.28), 0 4px 10px -2px rgb(124 106 232 / 0.16);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply font-sans;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ==========================================================================
+   Typography system
+   Display → Caption. One scale, used everywhere instead of ad-hoc
+   text-[…] utilities. Sizes are fluid (clamp) where they need to flex
+   between mobile and desktop hero contexts.
+   ========================================================================== */
+@utility text-display {
+  font-size: clamp(2.5rem, 2rem + 2.2vw, 4rem);
+  line-height: 1.05;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+@utility text-h1 {
+  font-size: clamp(1.875rem, 1.6rem + 1.2vw, 2.75rem);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+@utility text-h2 {
+  font-size: clamp(1.5rem, 1.35rem + 0.7vw, 2.25rem);
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+@utility text-h3 {
+  font-size: clamp(1.25rem, 1.15rem + 0.4vw, 1.5rem);
+  line-height: 1.3;
+  font-weight: 600;
+}
+
+@utility text-body-lg {
+  font-size: 1.125rem;
+  line-height: 1.65;
+  font-weight: 400;
+}
+
+@utility text-body {
+  font-size: 1rem;
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+@utility text-small {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+@utility text-caption {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+/* Small uppercase eyebrow label — section kickers, "AI" tags, etc. */
+@utility text-eyebrow {
+  font-size: 0.75rem;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ==========================================================================
+   Layout rhythm — one container width, one section rhythm, reused by every
+   page instead of hand-rolled max-width and padding combinations.
+   ========================================================================== */
+@utility container-app {
+  width: 100%;
+  max-width: 80rem; /* 1280px */
+  margin-inline: auto;
+  padding-inline: 1rem;
+  @variant sm {
+    padding-inline: 1.5rem;
+  }
+  @variant lg {
+    padding-inline: 2rem;
+  }
+}
+
+@utility section-y {
+  padding-block: 2.5rem;
+  @variant md {
+    padding-block: 4rem;
+  }
+  @variant lg {
+    padding-block: 5rem;
+  }
 }
