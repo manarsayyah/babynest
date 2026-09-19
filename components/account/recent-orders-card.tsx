@@ -1,17 +1,22 @@
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { Skeleton } from "@/components/ui/skeleton"
 import { formatPrice } from "@/components/product/product-card"
-import type { AccountOrder, OrderStatus } from "@/lib/mock/account"
+import { orderStatusLabel, type Order, type OrderStatus } from "@/lib/api-client/orders"
 
-const statusVariant: Record<OrderStatus, "success" | "warning" | "ai"> = {
-  Delivered: "success",
-  Processing: "warning",
-  Shipped: "ai",
+const statusVariant: Record<OrderStatus, "success" | "warning" | "ai" | "outline" | "destructive"> = {
+  delivered: "success",
+  processing: "warning",
+  shipped: "ai",
+  pending: "outline",
+  cancelled: "destructive",
 }
 
-/** "Recent Orders" table with a link out to the future full Orders page. */
-function RecentOrdersCard({ orders }: { orders: AccountOrder[] }) {
+const itemCount = (order: Order) => order.items.reduce((sum, item) => sum + item.quantity, 0)
+
+/** "Recent Orders" table (the customer's own latest orders) with a link out to the full Orders page. */
+function RecentOrdersCard({ orders, status }: { orders: Order[] | null; status: "loading" | "error" | "ready" }) {
   return (
     <Card>
       <CardHeader>
@@ -30,21 +35,32 @@ function RecentOrdersCard({ orders }: { orders: AccountOrder[] }) {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order) => (
+              {(orders ?? []).map((order) => (
                 <tr key={order.id} className="border-b border-border last:border-0">
                   <td className="px-2 py-3 font-medium text-foreground">{order.id}</td>
                   <td className="px-2 py-3 text-muted-foreground">{order.date}</td>
-                  <td className="px-2 py-3 text-muted-foreground">{order.itemsCount} items</td>
+                  <td className="px-2 py-3 text-muted-foreground">{itemCount(order)} {itemCount(order) === 1 ? "item" : "items"}</td>
                   <td className="px-2 py-3 font-medium text-foreground">
                     {formatPrice(order.total)}
                   </td>
                   <td className="px-2 py-3">
-                    <Badge variant={statusVariant[order.status]}>{order.status}</Badge>
+                    <Badge variant={statusVariant[order.status]}>{orderStatusLabel[order.status]}</Badge>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          {status === "loading" ? (
+            <div className="flex flex-col gap-2 pt-3">
+              <Skeleton className="h-5 w-full" />
+              <Skeleton className="h-5 w-full" />
+              <Skeleton className="h-5 w-full" />
+            </div>
+          ) : status === "error" ? (
+            <p className="px-2 py-4 text-small text-muted-foreground">Couldn&apos;t load your orders right now.</p>
+          ) : orders && orders.length === 0 ? (
+            <p className="px-2 py-4 text-small text-muted-foreground">You haven&apos;t placed any orders yet.</p>
+          ) : null}
         </div>
         <Link
           href="/account/orders"

@@ -1,11 +1,12 @@
 import { Sparkles, ShoppingBag, Heart, Star } from "lucide-react"
 import { Card } from "@/components/ui/card"
 
+/** A value of `null` means "not available" (still loading, or nothing real to count) and renders as a dash. */
 export type AccountStatsProps = {
-  totalOrders: number
-  savedItems: number
-  reviews: number
-  aiRecommendations: number
+  totalOrders: number | null
+  savedItems: number | null
+  reviews: number | null
+  aiRecommendations: number | null
 }
 
 /** 4-up stat row: Orders / Wishlist / Reviews / AI Matches. */
@@ -25,7 +26,7 @@ function AccountStats({ totalOrders, savedItems, reviews, aiRecommendations }: A
             <Icon className="size-4 text-primary" />
             {label}
           </span>
-          <span className="text-h2 text-foreground">{value}</span>
+          <span className="text-h2 text-foreground">{value ?? "—"}</span>
           <span className="text-caption text-muted-foreground">{caption}</span>
         </Card>
       ))}

@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { toast } from "sonner"
+import { useSession } from "next-auth/react"
 import { Container } from "@/components/layout/container"
 import { AccountSidebar } from "@/components/account/account-sidebar"
 import { AccountHeader } from "@/components/account/account-header"
@@ -14,29 +15,39 @@ import { NotificationsCard } from "@/components/account/notifications-card"
 import { SecurityCard } from "@/components/account/security-card"
 import { AccountSettingsCard } from "@/components/account/account-settings-card"
 import { fetchAddresses, type SavedAddress } from "@/lib/api-client/addresses"
+import { fetchOrders, type Order } from "@/lib/api-client/orders"
+import { fetchWishlist } from "@/lib/api-client/wishlist"
 import { useAiRecommendations } from "@/components/ai/use-ai-recommendations"
 import { loadAIPreferences } from "@/lib/mock/ai-preferences"
-import {
-  defaultNotificationSettings,
-  getAccountStats,
-  initialProfile,
-  recentOrders,
-  securityInfo,
-  type AccountProfile,
-  type NotificationSettings,
-} from "@/lib/mock/account"
+import type { AccountProfile, NotificationSettings } from "@/lib/mock/account"
+
+/** Local, unsaved notification-preference toggles (no backend exists for them). */
+const defaultNotificationSettings: NotificationSettings = {
+  orderUpdates: true,
+  newProductRecommendations: true,
+  wishlistAlerts: true,
+  promotionalEmails: false,
+}
+
+const RECENT_ORDER_COUNT = 3
+
+function initialsOf(first: string, last: string) {
+  return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase() || "?"
+}
 
 /** Full Profile / My Account overview page: sidebar nav + welcome header + dashboard widgets. */
 function AccountPageContent() {
-  const [profile, setProfile] = React.useState<AccountProfile>(initialProfile)
   const [notifications, setNotifications] = React.useState<NotificationSettings>(
     defaultNotificationSettings
   )
   const [defaultAddress, setDefaultAddress] = React.useState<SavedAddress | null>(null)
   const [addressStatus, setAddressStatus] = React.useState<"loading" | "error" | "ready">("loading")
   const aiState = useAiRecommendations()
+  const { data: session, status: sessionStatus } = useSession()
   const [favoriteCategories, setFavoriteCategories] = React.useState<string[]>([])
-  const stats = React.useMemo(() => getAccountStats(), [])
+  const [orders, setOrders] = React.useState<Order[] | null>(null)
+  const [ordersStatus, setOrdersStatus] = React.useState<"loading" | "error" | "ready">("loading")
+  const [wishlistCount, setWishlistCount] = React.useState<number | null>(null)
 
   React.useEffect(() => {
     // The customer's own AI Preferences choices live in localStorage (no backend for them), which only
@@ -66,11 +77,47 @@ function AccountPageContent() {
       }
     }
 
+    async function loadOrders() {
+      try {
+        const list = await fetchOrders()
+        if (cancelled) return
+        setOrders(list)
+        setOrdersStatus("ready")
+      } catch {
+        if (!cancelled) setOrdersStatus("error")
+      }
+    }
+
+    async function loadWishlist() {
+      try {
+        const list = await fetchWishlist()
+        if (!cancelled) setWishlistCount(list.length)
+      } catch {
+        // Leave the count unknown (shown as a dash) rather than inventing a number.
+      }
+    }
+
     void load()
+    void loadOrders()
+    void loadWishlist()
     return () => {
       cancelled = true
     }
   }, [])
+
+  // Identity comes only from the authenticated session; the phone from the customer's own default address
+  // (the only phone number stored). Date of birth and gender are not stored anywhere.
+  const firstName = sessionStatus === "authenticated" ? session.user.firstName : ""
+  const lastName = sessionStatus === "authenticated" ? session.user.lastName : ""
+  const profile: AccountProfile = {
+    firstName,
+    lastName,
+    email: (sessionStatus === "authenticated" ? session.user.email : "") || "",
+    phone: defaultAddress?.phone || "Not provided",
+    dateOfBirth: "Not provided",
+    gender: "Not provided",
+    avatar: `https://placehold.co/200x200/FCE4E8/DB5E76?font=roboto&text=${initialsOf(firstName, lastName)}`,
+  }
 
   return (
     <main className="flex-1">
@@ -78,21 +125,21 @@ function AccountPageContent() {
         <AccountSidebar profile={profile} className="lg:sticky lg:top-20 lg:w-72 lg:shrink-0" />
 
         <div className="flex min-w-0 flex-1 flex-col gap-6">
-          <AccountHeader firstName={profile.firstName} />
+          <AccountHeader firstName={firstName} />
 
           <AccountStats
-            totalOrders={stats.totalOrders}
-            savedItems={stats.savedItems}
-            reviews={stats.reviews}
-            aiRecommendations={stats.aiRecommendations}
+            totalOrders={orders ? orders.length : null}
+            savedItems={wishlistCount}
+            reviews={null}
+            aiRecommendations={aiState.status === "ready" ? aiState.items.length : null}
           />
 
           <div className="grid gap-6 lg:grid-cols-2">
-            <PersonalInformationCard profile={profile} onSave={setProfile} />
+            <PersonalInformationCard profile={profile} />
             <DefaultAddressCard address={defaultAddress} status={addressStatus} />
           </div>
 
-          <RecentOrdersCard orders={recentOrders} />
+          <RecentOrdersCard orders={orders ? orders.slice(0, RECENT_ORDER_COUNT) : null} status={ordersStatus} />
 
           <AIPreferencesCard
             tags={favoriteCategories}
@@ -112,9 +159,9 @@ function AccountPageContent() {
           <div className="grid gap-6 lg:grid-cols-2">
             <NotificationsCard value={notifications} onChange={setNotifications} />
             <SecurityCard
-              passwordMasked={securityInfo.passwordMasked}
-              twoFactorEnabled={securityInfo.twoFactorEnabled}
-              lastLogin={securityInfo.lastLogin}
+              passwordMasked="••••••••"
+              twoFactorEnabled={false}
+              lastLogin="Not tracked"
             />
           </div>
 
