@@ -18,7 +18,7 @@ export const initialProfile: AccountProfile = {
   phone: "+961 71 234 567",
   dateOfBirth: "12 March 1995",
   gender: "Female",
-  avatar: "https://placehold.co/200x200/FCE4E8/DB5E76?font=roboto&text=MS",
+  avatar: "/avatars/avatar-rose.svg",
 }
 
 export type AccountAddress = {

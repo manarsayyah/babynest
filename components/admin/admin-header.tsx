@@ -95,7 +95,7 @@ function AdminHeader({ onMenuClick }: { onMenuClick: () => void }) {
           <DropdownMenuTrigger className="flex items-center gap-1.5 rounded-full py-1 pr-1.5 pl-1 hover:bg-muted">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://placehold.co/80x80/FCE4E8/DB5E76?font=roboto&text=A"
+              src="/avatars/avatar-rose.svg"
               alt="Admin"
               className="size-7 rounded-full object-cover ring-1 ring-foreground/10"
             />

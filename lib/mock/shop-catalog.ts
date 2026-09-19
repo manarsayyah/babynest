@@ -32,7 +32,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.8,
     reviewCount: 214,
     ageRangeMonths: { min: 0, max: 6 },
-    image: "https://placehold.co/500x500/FCEAE3/DB5E76?font=roboto&text=Onesie",
+    image: "/products/placeholders/no-image.svg",
     badge: { label: "Bestseller", tone: "warning" },
   },
   {
@@ -45,7 +45,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.6,
     reviewCount: 58,
     ageRangeMonths: { min: 6, max: 12 },
-    image: "https://placehold.co/500x500/FCEAE3/DB5E76?font=roboto&text=Cardigan",
+    image: "/products/placeholders/no-image.svg",
     badge: { label: "-18%", tone: "primary" },
   },
   {
@@ -57,7 +57,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.7,
     reviewCount: 91,
     ageRangeMonths: { min: 0, max: 6 },
-    image: "https://placehold.co/500x500/FCEAE3/DB5E76?font=roboto&text=Sleep+Gown",
+    image: "/products/placeholders/no-image.svg",
   },
   {
     id: "sp4",
@@ -68,7 +68,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.5,
     reviewCount: 302,
     ageRangeMonths: { min: 6, max: 12 },
-    image: "https://placehold.co/500x500/E7F3EE/2F9E5B?font=roboto&text=Diapers",
+    image: "/products/placeholders/no-image.svg",
   },
   {
     id: "sp5",
@@ -80,7 +80,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.6,
     reviewCount: 178,
     ageRangeMonths: { min: 0, max: 6 },
-    image: "https://placehold.co/500x500/E7F3EE/2F9E5B?font=roboto&text=Diapers",
+    image: "/products/placeholders/no-image.svg",
     badge: { label: "-20%", tone: "primary" },
   },
   {
@@ -92,7 +92,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.4,
     reviewCount: 47,
     ageRangeMonths: { min: 12, max: 24 },
-    image: "https://placehold.co/500x500/E7F3EE/2F9E5B?font=roboto&text=Swim",
+    image: "/products/placeholders/no-image.svg",
   },
   {
     id: "sp7",
@@ -104,7 +104,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.7,
     reviewCount: 96,
     ageRangeMonths: { min: 6, max: 12 },
-    image: "https://placehold.co/500x500/F1EEFC/7C6AE8?font=roboto&text=Stacking+Toy",
+    image: "/products/placeholders/no-image.svg",
     badge: { label: "-23%", tone: "primary" },
   },
   {
@@ -116,7 +116,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.9,
     reviewCount: 341,
     ageRangeMonths: { min: 0, max: 6 },
-    image: "https://placehold.co/500x500/F1EEFC/7C6AE8?font=roboto&text=Plush+Bear",
+    image: "/products/placeholders/no-image.svg",
   },
   {
     id: "sp9",
@@ -127,7 +127,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.8,
     reviewCount: 167,
     ageRangeMonths: { min: 0, max: 6 },
-    image: "https://placehold.co/500x500/F1EEFC/7C6AE8?font=roboto&text=Play+Gym",
+    image: "/products/placeholders/no-image.svg",
   },
   {
     id: "sp10",
@@ -138,7 +138,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.6,
     reviewCount: 128,
     ageRangeMonths: { min: 0, max: 6 },
-    image: "https://placehold.co/500x500/E7F1FA/3A7CB8?font=roboto&text=Bath+Set",
+    image: "/products/placeholders/no-image.svg",
   },
   {
     id: "sp11",
@@ -149,7 +149,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.7,
     reviewCount: 72,
     ageRangeMonths: { min: 0, max: 12 },
-    image: "https://placehold.co/500x500/E7F1FA/3A7CB8?font=roboto&text=Towel+Set",
+    image: "/products/placeholders/no-image.svg",
   },
   {
     id: "sp12",
@@ -160,7 +160,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.5,
     reviewCount: 64,
     ageRangeMonths: { min: 6, max: 12 },
-    image: "https://placehold.co/500x500/E7F1FA/3A7CB8?font=roboto&text=Bath+Toys",
+    image: "/products/placeholders/no-image.svg",
   },
   {
     id: "sp13",
@@ -171,7 +171,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.4,
     reviewCount: 72,
     ageRangeMonths: { min: 6, max: 24 },
-    image: "https://placehold.co/500x500/FCEEF2/B23F58?font=roboto&text=Bib+Set",
+    image: "/products/placeholders/no-image.svg",
   },
   {
     id: "sp14",
@@ -183,7 +183,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.6,
     reviewCount: 145,
     ageRangeMonths: { min: 0, max: 6 },
-    image: "https://placehold.co/500x500/FCEEF2/B23F58?font=roboto&text=Bottle+Set",
+    image: "/products/placeholders/no-image.svg",
     badge: { label: "-18%", tone: "primary" },
   },
   {
@@ -195,7 +195,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.7,
     reviewCount: 58,
     ageRangeMonths: { min: 12, max: 36 },
-    image: "https://placehold.co/500x500/FCEEF2/B23F58?font=roboto&text=Feeding+Set",
+    image: "/products/placeholders/no-image.svg",
     badge: { label: "New", tone: "success" },
   },
   {
@@ -207,7 +207,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.9,
     reviewCount: 54,
     ageRangeMonths: { min: 0, max: 6 },
-    image: "https://placehold.co/500x500/FBF3DE/C9971F?font=roboto&text=Mobile",
+    image: "/products/placeholders/no-image.svg",
     badge: { label: "New", tone: "success" },
   },
   {
@@ -219,7 +219,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.5,
     reviewCount: 39,
     ageRangeMonths: { min: 0, max: 96 },
-    image: "https://placehold.co/500x500/FBF3DE/C9971F?font=roboto&text=Curtains",
+    image: "/products/placeholders/no-image.svg",
   },
   {
     id: "sp18",
@@ -230,7 +230,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.6,
     reviewCount: 210,
     ageRangeMonths: { min: 0, max: 24 },
-    image: "https://placehold.co/500x500/FBF3DE/C9971F?font=roboto&text=Monitor",
+    image: "/products/placeholders/no-image.svg",
   },
   {
     id: "sp19",
@@ -242,7 +242,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.7,
     reviewCount: 1103,
     ageRangeMonths: { min: 0, max: 36 },
-    image: "https://placehold.co/500x500/EFEAE3/7A4B2E?font=roboto&text=Stroller",
+    image: "/products/placeholders/no-image.svg",
     badge: { label: "-20%", tone: "primary" },
   },
   {
@@ -254,7 +254,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.5,
     reviewCount: 88,
     ageRangeMonths: { min: 6, max: 36 },
-    image: "https://placehold.co/500x500/EFEAE3/7A4B2E?font=roboto&text=Travel+Stroller",
+    image: "/products/placeholders/no-image.svg",
   },
   {
     id: "sp21",
@@ -265,7 +265,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.8,
     reviewCount: 76,
     ageRangeMonths: { min: 6, max: 36 },
-    image: "https://placehold.co/500x500/EFEAE3/7A4B2E?font=roboto&text=Jogging+Stroller",
+    image: "/products/placeholders/no-image.svg",
   },
   {
     id: "sp22",
@@ -277,7 +277,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.7,
     reviewCount: 312,
     ageRangeMonths: { min: 0, max: 48 },
-    image: "https://placehold.co/500x500/E9F0E6/4C7A46?font=roboto&text=Car+Seat",
+    image: "/products/placeholders/no-image.svg",
     badge: { label: "-14%", tone: "primary" },
   },
   {
@@ -289,7 +289,7 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.6,
     reviewCount: 198,
     ageRangeMonths: { min: 0, max: 12 },
-    image: "https://placehold.co/500x500/E9F0E6/4C7A46?font=roboto&text=Infant+Seat",
+    image: "/products/placeholders/no-image.svg",
   },
   {
     id: "sp24",
@@ -300,6 +300,6 @@ export const shopCatalog: ShopProduct[] = [
     rating: 4.4,
     reviewCount: 54,
     ageRangeMonths: { min: 36, max: 96 },
-    image: "https://placehold.co/500x500/E9F0E6/4C7A46?font=roboto&text=Booster+Seat",
+    image: "/products/placeholders/no-image.svg",
   },
 ]

@@ -1,5 +1,6 @@
 import { apiFetch } from "@/lib/api-client/fetcher"
 import { PLACEHOLDER_PRODUCT_IMAGE } from "@/lib/api-client/image"
+import { avatarForId } from "@/lib/avatars"
 
 export type ReviewStatus = "pending" | "published" | "hidden"
 
@@ -13,20 +14,9 @@ export function formatReviewDate(isoDate: string) {
   return new Date(isoDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
 }
 
-const AVATAR_PALETTE = ["FCE4E8/DB5E76", "F1EEFC/7C6AE8", "E9F0E6/4C7A46", "FBF3DE/C9971F"]
-
-/** Initials avatar (the same placehold.co convention the admin UI already used) — colour picked from the customer id so it's stable. */
+/** Local avatar (public/avatars) — a tone picked from the customer id so it's stable. */
 export function reviewerAvatar(customer: { id: string; name: string } | null) {
-  const initials = customer
-    ? customer.name
-        .split(" ")
-        .map((part) => part[0])
-        .join("")
-        .slice(0, 2)
-        .toUpperCase()
-    : "?"
-  const tone = AVATAR_PALETTE[customer ? parseInt(customer.id.slice(-2), 16) % AVATAR_PALETTE.length : 0]
-  return `https://placehold.co/80x80/${tone}?font=roboto&text=${encodeURIComponent(initials || "?")}`
+  return avatarForId(customer?.id)
 }
 
 // ---------------------------------------------------------------------------

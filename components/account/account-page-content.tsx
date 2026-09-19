@@ -31,10 +31,6 @@ const defaultNotificationSettings: NotificationSettings = {
 
 const RECENT_ORDER_COUNT = 3
 
-function initialsOf(first: string, last: string) {
-  return `${first.charAt(0)}${last.charAt(0)}`.toUpperCase() || "?"
-}
-
 /** Full Profile / My Account overview page: sidebar nav + welcome header + dashboard widgets. */
 function AccountPageContent() {
   const [notifications, setNotifications] = React.useState<NotificationSettings>(
@@ -116,7 +112,7 @@ function AccountPageContent() {
     phone: defaultAddress?.phone || "Not provided",
     dateOfBirth: "Not provided",
     gender: "Not provided",
-    avatar: `https://placehold.co/200x200/FCE4E8/DB5E76?font=roboto&text=${initialsOf(firstName, lastName)}`,
+    avatar: "/avatars/avatar-rose.svg",
   }
 
   return (

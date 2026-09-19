@@ -38,7 +38,7 @@ function CategoryCard({
         )}
       >
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={imageSrc} alt={imageAlt} className="size-[68%] object-contain" />
+        <img src={imageSrc} alt={imageAlt} className="size-full object-cover" />
       </span>
       <span className="text-small font-medium text-foreground">{name}</span>
     </Link>

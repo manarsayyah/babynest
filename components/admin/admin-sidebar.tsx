@@ -81,7 +81,7 @@ function AdminSidebar({ className, onNavigate }: AdminSidebarProps) {
         <div className="flex items-center gap-2.5 rounded-lg px-1 py-1">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://placehold.co/80x80/FCE4E8/DB5E76?font=roboto&text=A"
+            src="/avatars/avatar-rose.svg"
             alt="Admin"
             className="size-9 shrink-0 rounded-full object-cover ring-1 ring-foreground/10"
           />

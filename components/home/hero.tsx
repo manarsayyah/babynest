@@ -46,7 +46,7 @@ function Hero() {
 
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://placehold.co/800x800/FCE4E8/DB5E76?font=roboto&text=BabyNest"
+            src="/home/hero-newborn-soft-blanket.jpg"
             alt="Baby resting peacefully wrapped in a soft blanket"
             className="relative size-full rounded-[2rem] object-cover shadow-xl ring-1 ring-foreground/10"
           />

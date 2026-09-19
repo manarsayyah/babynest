@@ -1,4 +1,5 @@
 import { apiFetch } from "@/lib/api-client/fetcher"
+import { avatarForId } from "@/lib/avatars"
 import type { AdminOrderStatus, AdminPaymentStatus } from "@/lib/api-client/admin-orders"
 
 export type CustomerStatus = "active" | "inactive"
@@ -12,13 +13,9 @@ export function formatCustomerDate(isoDate: string) {
   return new Date(isoDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
 }
 
-const AVATAR_PALETTE = ["FCE4E8/DB5E76", "F1EEFC/7C6AE8", "E9F0E6/4C7A46", "FBF3DE/C9971F"]
-
-/** Initials avatar (same placehold.co convention the admin UI already used) — colour picked from the id so it's stable per customer. */
+/** Local avatar (public/avatars) — a tone picked from the id so it's stable per customer. */
 export function customerAvatar(customer: { _id: string; firstName: string; lastName: string }) {
-  const initials = `${customer.firstName[0] ?? ""}${customer.lastName[0] ?? ""}`.toUpperCase() || "BN"
-  const tone = AVATAR_PALETTE[parseInt(customer._id.slice(-2), 16) % AVATAR_PALETTE.length]
-  return `https://placehold.co/80x80/${tone}?font=roboto&text=${initials}`
+  return avatarForId(customer._id)
 }
 
 /** Short display id derived from the real Mongo id (the last 6 hex chars). */

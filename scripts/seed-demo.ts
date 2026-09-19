@@ -48,6 +48,7 @@ import Notification from "../models/Notification"
 import AiSearchQuery from "../models/AiSearchQuery"
 import AiRecommendation from "../models/AiRecommendation"
 import { hasPhoto, productImageUrl } from "./product-images"
+import { mappedCategoryImage } from "../lib/category-images"
 
 const SALT_ROUNDS = 12
 const SEED_EMAIL_DOMAIN = "@seed.babynest.test"
@@ -70,11 +71,6 @@ function at(daysAgo: number, hour = 10, minute = 0): Date {
 const plusHours = (d: Date, h: number) => {
   const r = new Date(d.getTime() + h * 3_600_000)
   return r > NOW ? new Date(NOW.getTime() - 30_000) : r
-}
-
-function buildImageUrl(seed: string, index: number): string {
-  const palette = ["F5EDE6", "FCEAE3", "E7F1FA", "F1EEFC", "FBF3DE", "E9F0E6"]
-  return `https://placehold.co/800x800/${palette[index % palette.length]}/2B2320?font=roboto&text=${encodeURIComponent(`${seed} ${index + 1}`)}`
 }
 
 // ---------------------------------------------------------------------------
@@ -364,7 +360,7 @@ async function main() {
     for (const seed of [...CATEGORY_SEEDS.filter((c) => !c.parent), ...CATEGORY_SEEDS.filter((c) => c.parent)]) {
       const doc = await Category.findOneAndUpdate(
         { slug: seed.slug },
-        { $set: { name: seed.name, description: seed.description, parentCategoryId: seed.parent ? (catId.get(seed.parent) ?? null) : null, tintClassName: seed.tint, image: buildImageUrl(seed.name, 0), status: "active", deletedAt: null } },
+        { $set: { name: seed.name, description: seed.description, parentCategoryId: seed.parent ? (catId.get(seed.parent) ?? null) : null, tintClassName: seed.tint, image: mappedCategoryImage(seed.slug) ?? "/products/placeholders/no-image.svg", status: "active", deletedAt: null } },
         { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
       )
       catId.set(seed.slug, doc!._id)

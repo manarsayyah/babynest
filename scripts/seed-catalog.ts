@@ -25,6 +25,7 @@ import ProductVariant from "../models/ProductVariant"
 import ProductImage from "../models/ProductImage"
 import ProductTag from "../models/ProductTag"
 import { hasPhoto, productImageUrl } from "./product-images"
+import { mappedCategoryImage } from "../lib/category-images"
 
 // ---------------------------------------------------------------------------
 // Seed data
@@ -443,13 +444,6 @@ function slugify(value: string): string {
     .replace(/^-+|-+$/g, "")
 }
 
-function buildImageUrl(seed: string, index: number): string {
-  const palette = ["F5EDE6", "FCEAE3", "E7F1FA", "F1EEFC", "FBF3DE", "E9F0E6"]
-  const bg = palette[index % palette.length]
-  const text = encodeURIComponent(`${seed} ${index + 1}`)
-  return `https://placehold.co/800x800/${bg}/2B2320?font=roboto&text=${text}`
-}
-
 const counts = {
   categoriesTopLevel: 0,
   categoriesSub: 0,
@@ -471,7 +465,7 @@ async function upsertCategory(seed: CategorySeed, parentId: string | null) {
         description: seed.description,
         parentCategoryId: parentId,
         tintClassName: seed.tintClassName,
-        image: buildImageUrl(seed.name, 0),
+        image: mappedCategoryImage(seed.slug) ?? "/products/placeholders/no-image.svg",
         status: "active",
         deletedAt: null,
       },

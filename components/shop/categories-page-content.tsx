@@ -9,7 +9,7 @@ import { EmptyState } from "@/components/ui/empty-state"
 import { Skeleton } from "@/components/ui/skeleton"
 import { CategoryCard } from "@/components/product/category-card"
 import { fetchCategories } from "@/lib/api-client/categories"
-import { PLACEHOLDER_PRODUCT_IMAGE } from "@/lib/api-client/image"
+import { categoryImageFor } from "@/lib/category-images"
 import { ApiRequestError } from "@/lib/api-client/fetcher"
 import type { ApiCategory } from "@/lib/api-client/types"
 
@@ -86,7 +86,7 @@ function CategoriesPageContent() {
               <CategoryCard
                 key={category._id}
                 href={`/products?category=${category.slug}`}
-                imageSrc={category.image ?? PLACEHOLDER_PRODUCT_IMAGE}
+                imageSrc={categoryImageFor(category.slug, category.image)}
                 imageAlt={category.name}
                 name={category.name}
                 tintClassName={category.tintClassName}

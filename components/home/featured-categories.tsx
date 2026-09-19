@@ -2,6 +2,7 @@ import { Container } from "@/components/layout/container"
 import { SectionHeader } from "@/components/layout/section-header"
 import { CategoryCard } from "@/components/product/category-card"
 import { mockCategories } from "@/lib/mock/categories"
+import { categoryImageFor } from "@/lib/category-images"
 
 /** "Shop by Category" rail. */
 function FeaturedCategories() {
@@ -18,7 +19,7 @@ function FeaturedCategories() {
             <CategoryCard
               key={category.slug}
               href={`/products?category=${category.slug}`}
-              imageSrc={category.image}
+              imageSrc={categoryImageFor(category.slug, category.image)}
               imageAlt={category.name}
               name={category.name}
               tintClassName={category.tintClassName}

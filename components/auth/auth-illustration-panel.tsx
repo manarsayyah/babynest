@@ -48,7 +48,7 @@ function AuthIllustrationPanel({ heading, subtext }: AuthIllustrationPanelProps)
         <div className="size-full overflow-hidden rounded-[45%_55%_60%_40%/50%_45%_55%_50%] shadow-lg ring-1 ring-foreground/10">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://placehold.co/640x800/F4A6B7/7A4B2E?font=roboto&text=BabyNest"
+            src="/auth/auth-parent-holding-baby-nursery.jpg"
             alt="A parent gently holding their baby beside a nursery crib"
             className="size-full object-cover"
           />

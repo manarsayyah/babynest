@@ -1,4 +1,5 @@
 import { apiFetch } from "@/lib/api-client/fetcher"
+import { categoryImageFor } from "@/lib/category-images"
 
 export type CategoryStatus = "active" | "inactive"
 
@@ -11,11 +12,9 @@ export function formatCategoryDate(isoDate: string) {
   return new Date(isoDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
 }
 
-/** Initials placeholder (the same placehold.co convention the admin UI already used) for a category that has no image. */
-export function categoryImage(category: { name: string; image: string }) {
-  if (category.image) return category.image
-  const initials = category.name.trim() ? category.name.trim().slice(0, 2).toUpperCase() : "BN"
-  return `https://placehold.co/200x200/FCEAE3/DB5E76?font=roboto&text=${encodeURIComponent(initials)}`
+/** Local category image (see lib/category-images.ts): the mapped photo, an admin-set image, or the local no-image placeholder. */
+export function categoryImage(category: { slug?: string; name: string; image: string }) {
+  return categoryImageFor(category.slug ?? slugifyName(category.name), category.image)
 }
 
 /** Lowercase, hyphenated, URL-safe slug from a display name — matches slugSchema on the server. */

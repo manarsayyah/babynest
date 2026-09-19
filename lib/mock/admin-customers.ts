@@ -22,19 +22,11 @@ export type AdminCustomer = {
   joinedDate: string
 }
 
-function avatarFor(name: string, tone: "rose" | "lavender" | "sage" | "beige" = "rose") {
-  const initials = name
-    .split(" ")
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase()
-  const palette: Record<typeof tone, string> = {
-    rose: "FCE4E8/DB5E76",
-    lavender: "F1EEFC/7C6AE8",
-    sage: "E9F0E6/4C7A46",
-    beige: "FBF3DE/C9971F",
-  }
-  return `https://placehold.co/80x80/${palette[tone]}?font=roboto&text=${initials}`
+const AVATAR_BY_TONE = { rose: "/avatars/avatar-rose.svg", lavender: "/avatars/avatar-lavender.svg", sage: "/avatars/avatar-sage.svg", beige: "/avatars/avatar-sand.svg" } as const
+
+/** Local avatar for a mock customer (public/avatars). */
+function avatarFor(_name: string, tone: keyof typeof AVATAR_BY_TONE = "rose") {
+  return AVATAR_BY_TONE[tone]
 }
 
 export const adminCustomers: AdminCustomer[] = [
