@@ -2,6 +2,7 @@ import type { NextRequest } from "next/server"
 import connectToDatabase from "@/lib/db"
 import Product from "@/models/Product"
 import Category from "@/models/Category"
+import { auth } from "@/auth"
 import { requireAdmin } from "@/lib/api/auth"
 import { getProductDetailByIdOrSlug } from "@/lib/api/product-detail"
 import { badRequest, conflict, notFound, ok, serverError, validationFailed } from "@/lib/api/response"
@@ -14,7 +15,8 @@ type RouteParams = { params: Promise<{ id: string }> }
  * GET /api/products/[id] — one non-deleted product with its category,
  * variants, images, and tags. `id` may be either the product's ObjectId or
  * its slug (the storefront's /products/[slug] page resolves products by
- * slug, not id — see getProductDetailByIdOrSlug).
+ * slug, not id — see getProductDetailByIdOrSlug). Inactive products are 404 for
+ * everyone but a signed-in admin (the admin editor loads them through here).
  */
 export async function GET(_request: NextRequest, { params }: RouteParams) {
   try {
@@ -22,7 +24,8 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 
     await connectToDatabase()
 
-    const result = await getProductDetailByIdOrSlug(id)
+    const session = await auth()
+    const result = await getProductDetailByIdOrSlug(id, { includeInactive: session?.user?.role === "admin" })
     if (!result) return notFound()
 
     return ok({

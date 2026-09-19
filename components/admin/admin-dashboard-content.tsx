@@ -128,11 +128,11 @@ function AdminDashboardContent() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1fr_360px] xl:items-start">
-        <div className="flex flex-col gap-6">
+        <div className="flex min-w-0 flex-col gap-6">
           <SalesOverviewCard series={data.salesSeries} />
           <RecentOrdersPreviewCard orders={data.recentOrders} />
         </div>
-        <div className="flex flex-col gap-6">
+        <div className="flex min-w-0 flex-col gap-6">
           <TopProductsCard products={data.topProducts} />
           <DashboardAIInsightsCard highlights={data.highlights} />
         </div>

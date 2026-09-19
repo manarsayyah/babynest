@@ -1,22 +1,36 @@
 import { Sparkles } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatPrice } from "@/lib/format"
-import { getCustomerInsights } from "@/lib/mock/admin-ai-insights"
+import type { AdminInsights } from "@/lib/api-client/admin-insights"
 
-/** "Customer Insights" — growth, retention, and spend signals derived from the admin customer/order lists. */
-function CustomerInsightsCard() {
-  const { total, newCustomers, returningRate, averageOrderValue } = getCustomerInsights()
+export type CustomerInsightsCardProps = {
+  customers: AdminInsights["customers"] | null
+}
 
+/** "Customer Insights" — growth, retention, and spend calculated from real customers and their (non-cancelled) orders. */
+function CustomerInsightsCard({ customers }: CustomerInsightsCardProps) {
   const rows = [
-    { label: "New Customer Growth", value: newCustomers.toLocaleString("en-US"), note: "Joined in the last 30 days" },
-    { label: "Returning Customer Rate", value: `${returningRate.toFixed(0)}%`, note: "Placed 2+ orders" },
-    { label: "Average Order Value", value: formatPrice(averageOrderValue), note: "Across all orders" },
+    {
+      label: "New Customer Growth",
+      value: customers ? customers.newLast30Days.toLocaleString("en-US") : "—",
+      note: "Joined in the last 30 days",
+    },
+    {
+      label: "Returning Customer Rate",
+      value: customers ? `${customers.returningRate.toFixed(0)}%` : "—",
+      note: "Placed 2+ orders",
+    },
+    {
+      label: "Average Order Value",
+      value: customers && customers.averageOrderValue !== null ? formatPrice(customers.averageOrderValue) : "—",
+      note: customers && customers.averageOrderValue === null ? "No orders yet" : "Across non-cancelled orders",
+    },
   ]
 
   const interpretation =
-    total > 0
-      ? `${returningRate.toFixed(0)}% of your customers are repeat shoppers, and ${newCustomers} joined in the last 30 days — retention is a bigger driver of revenue here than acquisition alone.`
-      : "Not enough customer data yet to generate a trend summary."
+    customers && customers.total > 0
+      ? `${customers.returningRate.toFixed(0)}% of your customers are repeat shoppers, and ${customers.newLast30Days} joined in the last 30 days.`
+      : "Not enough customer data yet to generate a summary."
 
   return (
     <Card>

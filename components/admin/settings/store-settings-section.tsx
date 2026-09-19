@@ -1,8 +1,5 @@
-"use client"
-
-import * as React from "react"
-import { toast } from "sonner"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -14,100 +11,92 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { timezoneOptions, type StoreSettings } from "@/lib/mock/admin-settings"
+import type { AdminSettings } from "@/lib/api-client/admin-settings"
 
 export type StoreSettingsSectionProps = {
-  value: StoreSettings
-  onSave: (next: StoreSettings) => void
+  store: AdminSettings["store"]
 }
+
+const currencyLabels: Record<string, string> = { USD: "USD — US Dollar" }
+const timezoneLabels: Record<string, string> = { UTC: "Coordinated Universal Time (UTC)" }
 
 function ToggleRow({
   title,
   description,
+  note,
   checked,
-  onCheckedChange,
 }: {
   title: string
   description: string
+  note: string
   checked: boolean
-  onCheckedChange: (checked: boolean) => void
 }) {
   return (
     <div className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0">
       <div className="min-w-0">
         <p className="text-small font-medium text-foreground">{title}</p>
         <p className="text-caption text-muted-foreground">{description}</p>
+        <p className="text-caption text-muted-foreground">{note}</p>
       </div>
-      <Switch checked={checked} onCheckedChange={onCheckedChange} aria-label={title} />
+      <Switch checked={checked} disabled aria-label={title} />
     </div>
   )
 }
 
-/** "Store Settings" — currency/timezone/order & inventory toggles/low-stock threshold, draft-until-saved. */
-function StoreSettingsSection({ value, onSave }: StoreSettingsSectionProps) {
-  const [draft, setDraft] = React.useState(value)
-
-  function update<K extends keyof StoreSettings>(key: K, next: StoreSettings[K]) {
-    setDraft((prev) => ({ ...prev, [key]: next }))
-  }
-
-  function handleSave() {
-    const threshold = Math.max(0, Math.round(draft.lowStockThreshold) || 0)
-    onSave({ ...draft, lowStockThreshold: threshold })
-    toast.success("Settings saved successfully.")
-  }
-
-  function handleCancel() {
-    setDraft(value)
-  }
-
+/**
+ * "Store Settings" — the values the application really runs on (currency, timezone, low-stock threshold, and the
+ * always-on order/inventory behavior), shown read-only. There's no settings storage to save changes to, so every
+ * control is disabled rather than pretending to persist.
+ */
+function StoreSettingsSection({ store }: StoreSettingsSectionProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-h3">Store Settings</CardTitle>
+        <div className="flex flex-wrap items-center gap-2">
+          <CardTitle className="text-h3">Store Settings</CardTitle>
+          <Badge variant="outline">Read-only</Badge>
+        </div>
         <p className="text-caption text-muted-foreground">Currency, timezone, and order/inventory behavior</p>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
+        <p className="text-caption text-muted-foreground">
+          These are the values BabyNest currently runs on. They&apos;re fixed in the application for now — saving store
+          settings needs storage the project doesn&apos;t have yet.
+        </p>
+
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="store-currency">Currency</Label>
-            <Select value="USD" onValueChange={() => {}} disabled>
+            <Select value={store.currency} disabled>
               <SelectTrigger id="store-currency" className="w-full rounded-lg">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="USD">USD — US Dollar</SelectItem>
+                <SelectItem value={store.currency}>{currencyLabels[store.currency] ?? store.currency}</SelectItem>
               </SelectContent>
             </Select>
-            <p className="text-caption text-muted-foreground">Additional currencies aren&apos;t supported yet.</p>
+            <p className="text-caption text-muted-foreground">Cash on Delivery is the only payment method.</p>
           </div>
 
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="store-timezone">Timezone</Label>
-            <Select value={draft.timezone} onValueChange={(v) => update("timezone", v ?? draft.timezone)}>
+            <Select value={store.timezone} disabled>
               <SelectTrigger id="store-timezone" className="w-full rounded-lg">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {timezoneOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
+                <SelectItem value={store.timezone}>{timezoneLabels[store.timezone] ?? store.timezone}</SelectItem>
               </SelectContent>
             </Select>
+            <p className="text-caption text-muted-foreground">Reports and dashboards group dates in UTC.</p>
           </div>
 
           <div className="flex flex-col gap-1.5">
             <Label htmlFor="low-stock-threshold">Low Stock Threshold</Label>
-            <Input
-              id="low-stock-threshold"
-              type="number"
-              min={0}
-              value={draft.lowStockThreshold}
-              onChange={(e) => update("lowStockThreshold", Number(e.target.value))}
-            />
-            <p className="text-caption text-muted-foreground">Units remaining before a product is flagged as low stock.</p>
+            <Input id="low-stock-threshold" type="number" value={store.lowStockThreshold} readOnly disabled />
+            <p className="text-caption text-muted-foreground">
+              Units remaining before a product is flagged as low stock (Products, Reports and AI Insights).
+            </p>
           </div>
         </div>
 
@@ -115,26 +104,26 @@ function StoreSettingsSection({ value, onSave }: StoreSettingsSectionProps) {
           <ToggleRow
             title="Order Processing"
             description="Allow new orders to be placed and processed."
-            checked={draft.orderProcessingEnabled}
-            onCheckedChange={(checked) => update("orderProcessingEnabled", checked)}
+            note="Always on — orders can't be paused yet."
+            checked
           />
           <ToggleRow
             title="Inventory Tracking"
             description="Automatically track stock levels as orders come in."
-            checked={draft.inventoryTrackingEnabled}
-            onCheckedChange={(checked) => update("inventoryTrackingEnabled", checked)}
+            note="Always on — checkout always deducts variant stock."
+            checked
           />
           <ToggleRow
             title="Out of Stock Notifications"
             description="Notify the team when a product's stock reaches zero."
-            checked={draft.outOfStockNotifications}
-            onCheckedChange={(checked) => update("outOfStockNotifications", checked)}
+            note="Not available yet — no notification of this kind exists."
+            checked={false}
           />
         </div>
 
         <div className="flex gap-2">
-          <Button onClick={handleSave}>Save Changes</Button>
-          <Button variant="outline" onClick={handleCancel}>
+          <Button disabled>Save Changes</Button>
+          <Button variant="outline" disabled>
             Cancel
           </Button>
         </div>

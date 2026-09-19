@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "seed:admin": "tsx --env-file-if-exists=.env.local scripts/seed-admin.ts",
-    "seed:catalog": "tsx --env-file-if-exists=.env.local scripts/seed-catalog.ts"
+    "seed:catalog": "tsx --env-file-if-exists=.env.local scripts/seed-catalog.ts",
+    "seed:demo": "tsx --env-file-if-exists=.env.local scripts/seed-demo.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^4.0.53",

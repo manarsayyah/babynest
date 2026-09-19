@@ -74,7 +74,7 @@ function CustomersToolbar({
       />
 
       <div className="flex flex-1 flex-wrap items-center gap-2">
-        <Select value={status} onValueChange={(value) => onStatusChange((value as CustomerStatusFilter) ?? status)}>
+        <Select value={status} items={statusOptions} onValueChange={(value) => onStatusChange((value as CustomerStatusFilter) ?? status)}>
           <SelectTrigger className="h-9 rounded-full">
             <span className="text-muted-foreground">Status:</span>
             <SelectValue />
@@ -90,6 +90,7 @@ function CustomersToolbar({
 
         <Select
           value={registrationDate}
+          items={registrationDateOptions}
           onValueChange={(value) => onRegistrationDateChange((value as RegistrationDateFilter) ?? registrationDate)}
         >
           <SelectTrigger className="h-9 rounded-full">
@@ -105,7 +106,7 @@ function CustomersToolbar({
           </SelectContent>
         </Select>
 
-        <Select value={sort} onValueChange={(value) => onSortChange((value as CustomerSortKey) ?? sort)}>
+        <Select value={sort} items={sortOptions} onValueChange={(value) => onSortChange((value as CustomerSortKey) ?? sort)}>
           <SelectTrigger className="h-9 rounded-full">
             <span className="text-muted-foreground">Sort:</span>
             <SelectValue />

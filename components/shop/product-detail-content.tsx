@@ -143,7 +143,7 @@ function ProductDetailContent({ product, related }: ProductDetailContentProps) {
 
         <div className="grid gap-10 lg:grid-cols-2 lg:items-start">
           {/* Left: gallery + AI recommend panel */}
-          <div className="flex flex-col gap-6">
+          <div className="flex min-w-0 flex-col gap-6">
             <ProductGallery images={product.gallery} alt={product.name} />
 
             {product.aiMatchPercent !== undefined && product.aiHighlights ? (
@@ -172,7 +172,7 @@ function ProductDetailContent({ product, related }: ProductDetailContentProps) {
           </div>
 
           {/* Right: buy box */}
-          <div className="flex flex-col gap-5">
+          <div className="flex min-w-0 flex-col gap-5">
             <div className="flex items-start justify-between gap-3">
               <div className="flex flex-col gap-2">
                 <div className="flex flex-wrap items-center gap-2">

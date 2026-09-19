@@ -61,7 +61,7 @@ function CategoriesToolbar({
       />
 
       <div className="flex flex-1 flex-wrap items-center gap-2">
-        <Select value={status} onValueChange={(value) => onStatusChange((value as CategoryStatusFilter) ?? status)}>
+        <Select value={status} items={statusOptions} onValueChange={(value) => onStatusChange((value as CategoryStatusFilter) ?? status)}>
           <SelectTrigger className="h-9 rounded-full">
             <span className="text-muted-foreground">Status:</span>
             <SelectValue />
@@ -75,7 +75,7 @@ function CategoriesToolbar({
           </SelectContent>
         </Select>
 
-        <Select value={sort} onValueChange={(value) => onSortChange((value as CategorySortKey) ?? sort)}>
+        <Select value={sort} items={sortOptions} onValueChange={(value) => onSortChange((value as CategorySortKey) ?? sort)}>
           <SelectTrigger className="h-9 rounded-full">
             <span className="text-muted-foreground">Sort:</span>
             <SelectValue />

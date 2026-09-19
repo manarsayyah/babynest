@@ -10,7 +10,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { reviewProductOptions } from "@/lib/mock/admin-reviews"
 
 export type RatingFilter = "all" | "5" | "4" | "3" | "2" | "1"
 export type ReviewStatusFilter = "all" | "published" | "pending" | "hidden"
@@ -47,6 +46,8 @@ export type ReviewsToolbarProps = {
   status: ReviewStatusFilter
   onStatusChange: (value: ReviewStatusFilter) => void
   product: string
+  /** Products that have reviews, from the server (value = product id). */
+  productOptions: { value: string; label: string }[]
   onProductChange: (value: string) => void
   sort: ReviewSortKey
   onSortChange: (value: ReviewSortKey) => void
@@ -63,6 +64,7 @@ function ReviewsToolbar({
   status,
   onStatusChange,
   product,
+  productOptions,
   onProductChange,
   sort,
   onSortChange,
@@ -81,7 +83,7 @@ function ReviewsToolbar({
       />
 
       <div className="flex flex-1 flex-wrap items-center gap-2">
-        <Select value={rating} onValueChange={(value) => onRatingChange((value as RatingFilter) ?? rating)}>
+        <Select value={rating} items={ratingOptions} onValueChange={(value) => onRatingChange((value as RatingFilter) ?? rating)}>
           <SelectTrigger className="h-9 rounded-full">
             <span className="text-muted-foreground">Rating:</span>
             <SelectValue />
@@ -95,7 +97,7 @@ function ReviewsToolbar({
           </SelectContent>
         </Select>
 
-        <Select value={status} onValueChange={(value) => onStatusChange((value as ReviewStatusFilter) ?? status)}>
+        <Select value={status} items={statusOptions} onValueChange={(value) => onStatusChange((value as ReviewStatusFilter) ?? status)}>
           <SelectTrigger className="h-9 rounded-full">
             <span className="text-muted-foreground">Status:</span>
             <SelectValue />
@@ -109,14 +111,17 @@ function ReviewsToolbar({
           </SelectContent>
         </Select>
 
-        <Select value={product} onValueChange={(value) => onProductChange(value ?? product)}>
+        <Select
+          value={product}
+          items={[{ value: "all", label: "All Products" }, ...productOptions]}
+          onValueChange={(value) => onProductChange(value ?? product)}>
           <SelectTrigger className="h-9 max-w-48 rounded-full">
             <span className="text-muted-foreground">Product:</span>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Products</SelectItem>
-            {reviewProductOptions.map((option) => (
+            {productOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
               </SelectItem>
@@ -124,7 +129,7 @@ function ReviewsToolbar({
           </SelectContent>
         </Select>
 
-        <Select value={sort} onValueChange={(value) => onSortChange((value as ReviewSortKey) ?? sort)}>
+        <Select value={sort} items={sortOptions} onValueChange={(value) => onSortChange((value as ReviewSortKey) ?? sort)}>
           <SelectTrigger className="h-9 rounded-full">
             <span className="text-muted-foreground">Sort:</span>
             <SelectValue />

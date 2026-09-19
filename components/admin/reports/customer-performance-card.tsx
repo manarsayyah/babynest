@@ -1,9 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatPrice } from "@/lib/format"
-import type { CustomerReport } from "@/lib/mock/admin-reports"
+import type { AdminReport } from "@/lib/api-client/admin-reports"
 
 export type CustomerPerformanceCardProps = {
-  report: CustomerReport
+  report: AdminReport["customers"]
 }
 
 /** "Customer Performance" — new/returning counts, average spend, and a short growth read. */

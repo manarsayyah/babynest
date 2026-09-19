@@ -4,8 +4,7 @@ import { cn } from "cn"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { EmptyState } from "@/components/ui/empty-state"
-import { LOW_STOCK_THRESHOLD } from "@/lib/mock/admin-products"
-import { getInventoryRiskCounts, getVelocityRestockCandidates } from "@/lib/mock/admin-ai-insights"
+import type { AdminInsights } from "@/lib/api-client/admin-insights"
 
 const priorityBadgeVariant = {
   high: "warning",
@@ -27,42 +26,47 @@ type InventoryRow = {
   priority: keyof typeof priorityLabel
 }
 
-/** "Inventory Insights" — restock/out-of-stock signals derived from the real admin product list. */
-function InventoryInsightsCard() {
-  const { outOfStock, lowStock } = getInventoryRiskCounts()
-  const velocityCandidates = getVelocityRestockCandidates(2)
+export type InventoryInsightsCardProps = {
+  inventory: AdminInsights["inventory"] | null
+}
 
+/** "Inventory Insights" — restock/out-of-stock signals calculated from real product and variant stock and recent sales. */
+function InventoryInsightsCard({ inventory }: InventoryInsightsCardProps) {
   const rows: InventoryRow[] = []
 
-  if (outOfStock.length > 0) {
-    rows.push({
-      id: "out-of-stock",
-      icon: PackageX,
-      title: `${outOfStock.length} ${outOfStock.length === 1 ? "product is" : "products are"} out of stock`,
-      description: outOfStock.map((p) => p.name).slice(0, 3).join(", ") + (outOfStock.length > 3 ? ", and more." : "."),
-      priority: "high",
+  if (inventory) {
+    const { outOfStock, lowStock, restockCandidates, threshold } = inventory
+
+    if (outOfStock.length > 0) {
+      rows.push({
+        id: "out-of-stock",
+        icon: PackageX,
+        title: `${outOfStock.length} ${outOfStock.length === 1 ? "product is" : "products are"} out of stock`,
+        description: outOfStock.map((p) => p.name).slice(0, 3).join(", ") + (outOfStock.length > 3 ? ", and more." : "."),
+        priority: "high",
+      })
+    }
+
+    if (lowStock.length > 0) {
+      rows.push({
+        id: "low-stock",
+        icon: AlertTriangle,
+        title: `${lowStock.length} ${lowStock.length === 1 ? "product" : "products"} may run out of stock soon`,
+        description: `${threshold} units or fewer: ${lowStock.map((p) => p.name).slice(0, 3).join(", ")}${lowStock.length > 3 ? ", and more." : "."}`,
+        priority: "medium",
+      })
+    }
+
+    restockCandidates.forEach((product) => {
+      rows.push({
+        id: `restock-${product.id}`,
+        icon: TrendingUp,
+        title: `${product.name} is selling fast`,
+        description: `${product.soldLast30Days} ${product.soldLast30Days === 1 ? "unit" : "units"} sold in the last 30 days with only ${product.stock} left — consider restocking soon.`,
+        priority: "medium",
+      })
     })
   }
-
-  if (lowStock.length > 0) {
-    rows.push({
-      id: "low-stock",
-      icon: AlertTriangle,
-      title: `${lowStock.length} ${lowStock.length === 1 ? "product" : "products"} may run out of stock soon`,
-      description: `Below ${LOW_STOCK_THRESHOLD} units: ${lowStock.map((p) => p.name).slice(0, 3).join(", ")}${lowStock.length > 3 ? ", and more." : "."}`,
-      priority: "medium",
-    })
-  }
-
-  velocityCandidates.forEach((product) => {
-    rows.push({
-      id: `velocity-${product.id}`,
-      icon: TrendingUp,
-      title: `${product.name} has strong sales velocity`,
-      description: `${product.reviewCount} reviews at ${product.rating.toFixed(1)}★ with only ${product.stock} units left — consider restocking soon.`,
-      priority: "medium",
-    })
-  })
 
   return (
     <Card>
@@ -97,7 +101,14 @@ function InventoryInsightsCard() {
             })}
           </div>
         ) : (
-          <EmptyState title="No insights available yet" description="Once your store has enough inventory data, stock recommendations will appear here." />
+          <EmptyState
+            title={inventory ? "No stock risks right now" : "No insights available yet"}
+            description={
+              inventory
+                ? `Every active product has more than ${inventory.threshold} units in stock.`
+                : "Once your store has enough inventory data, stock recommendations will appear here."
+            }
+          />
         )}
       </CardContent>
     </Card>

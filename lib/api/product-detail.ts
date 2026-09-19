@@ -13,11 +13,15 @@ import { attachPrimaryImages } from "@/lib/api/primary-images"
  * the server-rendered /products/[slug] page, so both resolve a product
  * with the exact same query and enrichment logic (category, variants,
  * images, tags), never two parallel implementations.
+ *
+ * Public callers only ever get an active product; `includeInactive` is for
+ * admin callers (the admin product editor), who must still reach inactive ones.
  */
-export async function getProductDetailByIdOrSlug(idOrSlug: string) {
+export async function getProductDetailByIdOrSlug(idOrSlug: string, options: { includeInactive?: boolean } = {}) {
+  const filter = options.includeInactive ? { deletedAt: null } : { deletedAt: null, isActive: true }
   const product = isValidObjectId(idOrSlug)
-    ? await Product.findOne({ _id: idOrSlug, deletedAt: null }).lean()
-    : await Product.findOne({ slug: idOrSlug, deletedAt: null }).lean()
+    ? await Product.findOne({ _id: idOrSlug, ...filter }).lean()
+    : await Product.findOne({ slug: idOrSlug, ...filter }).lean()
 
   if (!product) return null
 

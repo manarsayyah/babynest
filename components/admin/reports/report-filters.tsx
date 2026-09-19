@@ -12,13 +12,13 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Card } from "@/components/ui/card"
+import { FormError } from "@/components/ui/form-error"
 import {
-  reportCategoryOptions,
   reportDateRangeOptions,
   reportTypeOptions,
   type ReportDateRangeKey,
   type ReportType,
-} from "@/lib/mock/admin-reports"
+} from "@/lib/api-client/admin-reports"
 
 export type ReportFiltersValue = {
   dateRange: ReportDateRangeKey
@@ -30,12 +30,16 @@ export type ReportFiltersValue = {
 
 export type ReportFiltersProps = {
   value: ReportFiltersValue
+  /** Real categories from the reports API (value = category id) — empty until the first report has loaded. */
+  categoryOptions: { value: string; label: string }[]
+  /** Validation message for an incomplete/invalid custom range. */
+  error?: string | null
   onChange: (value: ReportFiltersValue) => void
   onApply: () => void
 }
 
 /** "Report Filters" — draft state, applied only when "Apply Filters" is clicked. */
-function ReportFilters({ value, onChange, onApply }: ReportFiltersProps) {
+function ReportFilters({ value, categoryOptions, error, onChange, onApply }: ReportFiltersProps) {
   function update<K extends keyof ReportFiltersValue>(key: K, next: ReportFiltersValue[K]) {
     onChange({ ...value, [key]: next })
   }
@@ -52,6 +56,7 @@ function ReportFilters({ value, onChange, onApply }: ReportFiltersProps) {
           <Label htmlFor="report-date-range">Date Range</Label>
           <Select
             value={value.dateRange}
+            items={reportDateRangeOptions}
             onValueChange={(v) => update("dateRange", (v as ReportDateRangeKey) ?? value.dateRange)}
           >
             <SelectTrigger id="report-date-range" className="w-full rounded-lg">
@@ -69,7 +74,7 @@ function ReportFilters({ value, onChange, onApply }: ReportFiltersProps) {
 
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="report-type">Report Type</Label>
-          <Select value={value.reportType} onValueChange={(v) => update("reportType", (v as ReportType) ?? value.reportType)}>
+          <Select value={value.reportType} items={reportTypeOptions} onValueChange={(v) => update("reportType", (v as ReportType) ?? value.reportType)}>
             <SelectTrigger id="report-type" className="w-full rounded-lg">
               <SelectValue />
             </SelectTrigger>
@@ -85,13 +90,16 @@ function ReportFilters({ value, onChange, onApply }: ReportFiltersProps) {
 
         <div className="flex flex-col gap-1.5">
           <Label htmlFor="report-category">Category (optional)</Label>
-          <Select value={value.category} onValueChange={(v) => update("category", v ?? value.category)}>
+          <Select
+            value={value.category}
+            items={[{ value: "all", label: "All Categories" }, ...categoryOptions]}
+            onValueChange={(v) => update("category", v ?? value.category)}>
             <SelectTrigger id="report-category" className="w-full rounded-lg">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
-              {reportCategoryOptions.map((option) => (
+              {categoryOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
@@ -129,6 +137,7 @@ function ReportFilters({ value, onChange, onApply }: ReportFiltersProps) {
           </div>
         </div>
       ) : null}
+      <FormError message={error} />
     </Card>
   )
 }

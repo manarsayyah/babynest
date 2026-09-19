@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
 
     await connectToDatabase()
 
-    const { name, slug, parentCategoryId } = parsed.data
+    const { name, slug, parentCategoryId, description, image, status } = parsed.data
 
     const existingSlug = await Category.findOne({ slug }).select("_id").lean()
     if (existingSlug) return conflict("A category with this slug already exists.")
@@ -65,6 +65,10 @@ export async function POST(request: NextRequest) {
       name,
       slug,
       parentCategoryId: parentCategoryId ?? null,
+      // Optional fields are only written when supplied, so the schema defaults (e.g. status: active) still apply.
+      ...(description !== undefined ? { description } : {}),
+      ...(image !== undefined ? { image } : {}),
+      ...(status !== undefined ? { status } : {}),
     })
 
     return created(category)

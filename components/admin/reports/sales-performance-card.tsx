@@ -4,10 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { EmptyState } from "@/components/ui/empty-state"
 import { SalesChart } from "@/components/admin/sales-chart"
 import { formatPrice } from "@/lib/format"
-import type { SalesPoint } from "@/lib/mock/admin-dashboard"
+import type { ReportSalesPoint } from "@/lib/api-client/admin-reports"
 
 export type SalesPerformanceCardProps = {
-  data: SalesPoint[]
+  data: ReportSalesPoint[]
   revenue: number
   changePercent: number | null
 }

@@ -3,7 +3,7 @@ import { ArrowDownRight, ArrowUpRight, DollarSign, Minus, ShoppingBag, Users } f
 import { cn } from "cn"
 import { Card } from "@/components/ui/card"
 import { formatPrice } from "@/lib/format"
-import type { ReportMetrics } from "@/lib/mock/admin-reports"
+import type { ReportMetrics } from "@/lib/api-client/admin-reports"
 
 const toneClasses = {
   primary: "bg-accent text-primary",

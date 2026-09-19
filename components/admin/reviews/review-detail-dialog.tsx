@@ -1,5 +1,6 @@
 "use client"
 
+import * as React from "react"
 import { Trash2 } from "lucide-react"
 import {
   Dialog,
@@ -12,7 +13,13 @@ import {
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Rating } from "@/components/product/rating"
-import { formatReviewDate, reviewStatusLabel, type AdminReview, type ReviewStatus } from "@/lib/mock/admin-reviews"
+import {
+  formatReviewDate,
+  reviewProductImage,
+  reviewStatusLabel,
+  type AdminReviewRow,
+  type ReviewStatus,
+} from "@/lib/api-client/admin-reviews"
 
 const statusBadgeVariant: Record<ReviewStatus, "success" | "warning" | "outline"> = {
   published: "success",
@@ -21,41 +28,56 @@ const statusBadgeVariant: Record<ReviewStatus, "success" | "warning" | "outline"
 }
 
 export type ReviewDetailDialogProps = {
-  review: AdminReview | null
+  review: AdminReviewRow | null
   onClose: () => void
-  onPublish: (review: AdminReview) => void
-  onHide: (review: AdminReview) => void
-  onRequestDelete: (review: AdminReview) => void
+  /** Each moderation action performs the real request; the dialog shows a busy state until it settles. */
+  onPublish: (review: AdminReviewRow) => Promise<void>
+  onHide: (review: AdminReviewRow) => Promise<void>
+  onRequestDelete: (review: AdminReviewRow) => void
 }
 
 /** Full review view — customer, product, rating, complete text — with Publish/Hide/Delete actions. */
 function ReviewDetailDialog({ review, onClose, onPublish, onHide, onRequestDelete }: ReviewDetailDialogProps) {
+  const [working, setWorking] = React.useState<"publish" | "hide" | null>(null)
+
+  async function run(action: "publish" | "hide", handler: (review: AdminReviewRow) => Promise<void>) {
+    if (!review) return
+    setWorking(action)
+    try {
+      await handler(review)
+    } finally {
+      setWorking(null)
+    }
+  }
+
   return (
     <Dialog
       open={review !== null}
       onOpenChange={(open) => {
-        if (!open) onClose()
+        if (!open && !working) onClose()
       }}
     >
       <DialogContent className="sm:max-w-lg">
         {review ? (
           <>
             <DialogHeader>
-              <DialogTitle>Review from {review.customerName}</DialogTitle>
-              <DialogDescription>{review.customerEmail}</DialogDescription>
+              <DialogTitle>Review from {review.customer?.name ?? "Unknown customer"}</DialogTitle>
+              <DialogDescription>{review.customer?.email ?? "This account no longer exists."}</DialogDescription>
             </DialogHeader>
 
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-3 rounded-lg bg-muted/50 p-3">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={review.productImage}
-                  alt={review.productName}
+                  src={reviewProductImage(review)}
+                  alt={review.product?.name ?? "Unavailable product"}
                   className="size-11 shrink-0 rounded-lg object-cover ring-1 ring-foreground/10"
                 />
                 <div className="min-w-0">
-                  <p className="truncate text-small font-medium text-foreground">{review.productName}</p>
-                  <p className="text-caption text-muted-foreground">{formatReviewDate(review.date)}</p>
+                  <p className="truncate text-small font-medium text-foreground">
+                    {review.product?.name ?? "Unavailable product"}
+                  </p>
+                  <p className="text-caption text-muted-foreground">{formatReviewDate(review.createdAt)}</p>
                 </div>
               </div>
 
@@ -72,21 +94,26 @@ function ReviewDetailDialog({ review, onClose, onPublish, onHide, onRequestDelet
                 variant="ghost"
                 className="text-destructive hover:bg-destructive/10 hover:text-destructive"
                 onClick={() => onRequestDelete(review)}
+                disabled={working !== null}
               >
                 <Trash2 data-icon="inline-start" />
                 Delete
               </Button>
               <div className="flex flex-col-reverse gap-2 sm:flex-row">
-                <Button variant="secondary" onClick={onClose}>
+                <Button variant="secondary" onClick={onClose} disabled={working !== null}>
                   Close
                 </Button>
                 {review.status === "published" ? (
-                  <Button variant="outline" onClick={() => onHide(review)}>
-                    Hide Review
+                  <Button variant="outline" onClick={() => void run("hide", onHide)} disabled={working !== null}>
+                    {working === "hide" ? "Hiding..." : "Hide Review"}
                   </Button>
                 ) : (
-                  <Button onClick={() => onPublish(review)}>
-                    {review.status === "pending" ? "Approve & Publish" : "Publish Review"}
+                  <Button onClick={() => void run("publish", onPublish)} disabled={working !== null}>
+                    {working === "publish"
+                      ? "Publishing..."
+                      : review.status === "pending"
+                        ? "Approve & Publish"
+                        : "Publish Review"}
                   </Button>
                 )}
               </div>

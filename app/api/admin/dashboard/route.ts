@@ -1,7 +1,6 @@
 import connectToDatabase from "@/lib/db"
 import User from "@/models/User"
 import Product from "@/models/Product"
-import ProductVariant from "@/models/ProductVariant"
 import Category from "@/models/Category"
 import Order from "@/models/Order"
 import OrderItem from "@/models/OrderItem"
@@ -9,9 +8,10 @@ import Review from "@/models/Review"
 import { requireAdmin } from "@/lib/api/auth"
 import { attachPrimaryImages } from "@/lib/api/primary-images"
 import { ok, serverError } from "@/lib/api/response"
+import { classifyInventory, getVariantStockSummaries } from "@/lib/api/inventory"
+import { LOW_STOCK_THRESHOLD } from "@/lib/admin-product-status"
 
 const DAY_MS = 86_400_000
-const LOW_STOCK_THRESHOLD = 5
 const RECENT_ORDER_COUNT = 6
 const TOP_PRODUCT_COUNT = 4
 
@@ -183,14 +183,16 @@ export async function GET() {
       .filter((entry): entry is NonNullable<typeof entry> => entry !== null)
 
     // ---- fact-based highlights (counted from the database — not generated text) ----
-    const [pendingOrders, pendingReviews, lowStockProductIds] = await Promise.all([
+    const [pendingOrders, pendingReviews, stockProducts, stockSummaries] = await Promise.all([
       Order.countDocuments({ deletedAt: null, status: "pending" }),
       Review.countDocuments({ deletedAt: null, status: "pending" }),
-      ProductVariant.distinct("productId", { deletedAt: null, stockQty: { $lte: LOW_STOCK_THRESHOLD } }),
+      Product.find({ deletedAt: null, isActive: true }).select("stock").lean(),
+      getVariantStockSummaries(),
     ])
-    const lowStockProducts = lowStockProductIds.length
-      ? await Product.countDocuments({ _id: { $in: lowStockProductIds }, deletedAt: null, isActive: true })
-      : 0
+    // Same inventory definition as Reports and AI Insights (lib/api/inventory.ts): out of stock or low stock.
+    const lowStockProducts = stockProducts.filter(
+      (product) => classifyInventory(product.stock, stockSummaries.get(String(product._id))) !== "ok"
+    ).length
 
     const plural = (n: number, one: string, many: string) => `${n} ${n === 1 ? one : many}`
     const highlights: string[] = []

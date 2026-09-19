@@ -10,6 +10,7 @@ import { isValidObjectId } from "@/lib/api/object-id"
 import { escapeRegex } from "@/lib/api/regex"
 import { parsePagination } from "@/lib/api/pagination"
 import { createProductSchema } from "@/lib/validation/product"
+import { getVariantStockSummaries } from "@/lib/api/inventory"
 
 const SORT_OPTIONS: Record<string, Record<string, 1 | -1>> = {
   newest: { createdAt: -1 },
@@ -75,9 +76,23 @@ export async function GET(request: NextRequest) {
       filter.rating = { $gte: Number(minRating) }
     }
 
+    // Availability follows variant stock (what checkout decrements): in stock = some non-deleted variant has
+    // units; out of stock = it has variants and none do. A product with no variants falls back to its own
+    // `stock`, the same rule the product detail page uses.
     const availability = searchParams.get("availability")
-    if (availability === "in-stock") filter.stock = { $gt: 0 }
-    if (availability === "out-of-stock") filter.stock = { $lte: 0 }
+    if (availability === "in-stock" || availability === "out-of-stock") {
+      const summaries = await getVariantStockSummaries()
+      const withVariants = [...summaries.keys()]
+      const inStockIds = [...summaries.entries()].filter(([, s]) => s.totalQty > 0).map(([id]) => id)
+      const soldOutIds = [...summaries.entries()].filter(([, s]) => s.totalQty <= 0).map(([id]) => id)
+      const and = (filter.$and as unknown[] | undefined) ?? []
+      and.push(
+        availability === "in-stock"
+          ? { $or: [{ _id: { $in: inStockIds } }, { _id: { $nin: withVariants }, stock: { $gt: 0 } }] }
+          : { $or: [{ _id: { $in: soldOutIds } }, { _id: { $nin: withVariants }, stock: { $lte: 0 } }] }
+      )
+      filter.$and = and
+    }
 
     const tagId = searchParams.get("tagId")
     if (tagId) {

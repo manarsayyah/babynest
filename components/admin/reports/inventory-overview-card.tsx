@@ -1,16 +1,15 @@
 import { AlertTriangle, PackageX } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatPrice } from "@/lib/format"
-import type { AdminProduct } from "@/lib/mock/admin-products"
 
 export type InventoryOverviewCardProps = {
   total: number
-  outOfStock: AdminProduct[]
-  lowStock: AdminProduct[]
+  outOfStock: { id: string; name: string }[]
+  lowStock: { id: string; name: string }[]
   inventoryValue: number
 }
 
-/** "Inventory Overview" — totals plus a subtle read on stock risk, from the real admin product list. */
+/** "Inventory Overview" — totals plus a subtle read on stock risk, from real product and variant stock. */
 function InventoryOverviewCard({ total, outOfStock, lowStock, inventoryValue }: InventoryOverviewCardProps) {
   const rows = [
     { label: "Total Products", value: total.toLocaleString("en-US") },

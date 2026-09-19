@@ -7,7 +7,7 @@ import { DangerActionDialog } from "@/components/admin/settings/danger-action-di
 
 type PendingAction = "disable" | "delete" | null
 
-/** "Danger Zone" — clearly separated but kept visually quiet; both actions require confirmation and are not wired up yet. */
+/** "Danger Zone" — clearly separated but kept visually quiet; neither action exists in the application, so both are unavailable. */
 function DangerZoneSection() {
   const [pendingAction, setPendingAction] = React.useState<PendingAction>(null)
 
@@ -16,7 +16,7 @@ function DangerZoneSection() {
       <div className="rounded-xl border border-destructive/30 bg-card p-5">
         <h2 className="text-small font-semibold text-destructive">Danger Zone</h2>
         <p className="mt-0.5 text-caption text-muted-foreground">
-          These actions affect your entire store. Proceed with caution.
+          These actions would affect your entire store. Neither is available yet.
         </p>
 
         <div className="mt-4 flex flex-col divide-y divide-border">
@@ -55,18 +55,16 @@ function DangerZoneSection() {
       <DangerActionDialog
         open={pendingAction === "disable"}
         title="Disable your store?"
-        description="Your storefront will stop accepting new orders until you re-enable it. Existing orders won't be affected."
+        description="Taking the storefront offline isn't available yet: it needs a store-wide setting that the application has nowhere to save. Nothing was changed."
         confirmLabel="Disable Store"
-        successMessage="The store"
         onClose={() => setPendingAction(null)}
       />
 
       <DangerActionDialog
         open={pendingAction === "delete"}
         title="Delete this store?"
-        description="This will permanently delete your store, products, orders, and customer data. This can't be undone."
+        description="Deleting a store isn't supported. It would permanently erase every product, order and customer, so BabyNest has no such feature. Nothing was changed."
         confirmLabel="Delete Store"
-        successMessage="The store"
         onClose={() => setPendingAction(null)}
       />
     </>

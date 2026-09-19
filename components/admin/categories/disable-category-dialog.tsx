@@ -1,6 +1,6 @@
 "use client"
 
-import { toast } from "sonner"
+import * as React from "react"
 import {
   Dialog,
   DialogContent,
@@ -10,21 +10,34 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import type { AdminCategory } from "@/lib/mock/admin-categories"
+import type { AdminCategoryRow } from "@/lib/api-client/admin-categories"
 
 export type DisableCategoryDialogProps = {
-  category: AdminCategory | null
+  category: AdminCategoryRow | null
   onClose: () => void
-  onConfirm: (categorySlug: string) => void
+  /** Performs the real status update; the dialog stays open and shows a busy state until it settles. */
+  onConfirm: (category: AdminCategoryRow) => Promise<void>
 }
 
 /** "Are you sure you want to disable this category?" — mirrors the other Admin pages' confirm pattern. */
 function DisableCategoryDialog({ category, onClose, onConfirm }: DisableCategoryDialogProps) {
+  const [isDisabling, setIsDisabling] = React.useState(false)
+
+  async function handleConfirm() {
+    if (!category) return
+    setIsDisabling(true)
+    try {
+      await onConfirm(category)
+    } finally {
+      setIsDisabling(false)
+    }
+  }
+
   return (
     <Dialog
       open={category !== null}
       onOpenChange={(open) => {
-        if (!open) onClose()
+        if (!open && !isDisabling) onClose()
       }}
     >
       <DialogContent className="sm:max-w-md">
@@ -41,19 +54,16 @@ function DisableCategoryDialog({ category, onClose, onConfirm }: DisableCategory
         </DialogHeader>
 
         <DialogFooter>
-          <Button variant="secondary" onClick={onClose}>
+          <Button variant="secondary" onClick={onClose} disabled={isDisabling}>
             Keep Active
           </Button>
           <Button
             variant="outline"
             className="border-destructive/40 text-destructive hover:bg-destructive/10"
-            onClick={() => {
-              if (!category) return
-              onConfirm(category.slug)
-              toast.success("Category disabled", { description: `${category.name} has been disabled.` })
-            }}
+            onClick={() => void handleConfirm()}
+            disabled={isDisabling}
           >
-            Disable Category
+            {isDisabling ? "Disabling..." : "Disable Category"}
           </Button>
         </DialogFooter>
       </DialogContent>

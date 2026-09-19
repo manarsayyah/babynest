@@ -70,7 +70,24 @@ async function runCheckout(
     subtotal: number
   }[] = []
 
+  // Atomically claim each cart line before touching stock, so two simultaneous
+  // submits (double-click / double request) can't both turn the same cart into
+  // an order: only the request that soft-deletes a line first may proceed.
+  const claimedItemIds: mongoose.Types.ObjectId[] = []
+
   try {
+    for (const item of cartItems) {
+      const claimed = await CartItem.findOneAndUpdate(
+        { _id: item._id, deletedAt: null },
+        { deletedAt: new Date() },
+        opts
+      )
+      if (!claimed) {
+        throw new CheckoutError(409, "Your cart is already being checked out or has changed. Please review your cart.")
+      }
+      claimedItemIds.push(item._id)
+    }
+
     for (const item of cartItems) {
       const variant = await ProductVariant.findOne({ _id: item.variantId, deletedAt: null }).session(session)
       if (!variant) {
@@ -229,6 +246,10 @@ async function runCheckout(
 
     return { order, orderItems, payment, shipment, orderPromotion, usedTransaction: session !== null }
   } catch (error) {
+    if (session === null && claimedItemIds.length > 0) {
+      // Give the cart lines back so the customer can retry after a failed attempt.
+      await CartItem.updateMany({ _id: { $in: claimedItemIds } }, { deletedAt: null })
+    }
     if (session === null && appliedDecrements.length > 0) {
       // No transaction to auto-rollback on this deployment — manually
       // restore any stock this attempt already decremented.

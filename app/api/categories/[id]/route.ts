@@ -75,7 +75,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const existing = await Category.findOne({ _id: id, deletedAt: null })
     if (!existing) return notFound()
 
-    const { name, slug, parentCategoryId } = parsed.data
+    const { name, slug, parentCategoryId, description, image, status } = parsed.data
 
     if (slug && slug !== existing.slug) {
       const slugTaken = await Category.findOne({ slug, _id: { $ne: id } }).select("_id").lean()
@@ -95,6 +95,9 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     if (name !== undefined) existing.name = name
     if (slug !== undefined) existing.slug = slug
+    if (description !== undefined) existing.description = description
+    if (image !== undefined) existing.image = image
+    if (status !== undefined) existing.status = status
     // Cast through `unknown` — Mongoose casts a hex string to ObjectId at
     // runtime, but the inferred document type expects Types.ObjectId.
     if (parentCategoryId !== undefined) {

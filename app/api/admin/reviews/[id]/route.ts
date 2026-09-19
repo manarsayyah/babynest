@@ -75,3 +75,33 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return serverError("PATCH /api/admin/reviews/[id] failed:", error)
   }
 }
+
+/**
+ * DELETE /api/admin/reviews/[id] — admin only, soft delete (sets deletedAt; the
+ * document stays in MongoDB), exactly like the owner's own DELETE
+ * /api/reviews/[id]. The product's rating/reviewCount are recalculated so a
+ * deleted review stops counting immediately.
+ */
+export async function DELETE(_request: NextRequest, { params }: RouteParams) {
+  try {
+    const { error: authError } = await requireAdmin()
+    if (authError) return authError
+
+    const { id } = await params
+    if (!isValidObjectId(id)) return notFound()
+
+    await connectToDatabase()
+
+    const review = await Review.findOne({ _id: id, deletedAt: null })
+    if (!review) return notFound()
+
+    review.deletedAt = new Date()
+    await review.save()
+
+    await recalculateProductRating(review.productId.toString())
+
+    return ok({ id })
+  } catch (error) {
+    return serverError("DELETE /api/admin/reviews/[id] failed:", error)
+  }
+}

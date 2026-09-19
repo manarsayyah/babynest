@@ -10,10 +10,12 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { formatPrice } from "@/lib/format"
 import {
+  customerAvatar,
   formatCustomerDate,
-  type AdminCustomer,
+  shortCustomerId,
+  type AdminCustomerRow,
   type CustomerStatus,
-} from "@/lib/mock/admin-customers"
+} from "@/lib/api-client/admin-customers"
 
 const statusBadgeVariant: Record<CustomerStatus, "success" | "outline"> = {
   active: "success",
@@ -26,26 +28,24 @@ const statusLabel: Record<CustomerStatus, string> = {
 }
 
 export type CustomersTableProps = {
-  customers: AdminCustomer[]
-  onView: (customer: AdminCustomer) => void
-  onViewOrders: (customer: AdminCustomer) => void
-  onEdit: (customer: AdminCustomer) => void
-  onDisable: (customer: AdminCustomer) => void
-  onEnable: (customer: AdminCustomer) => void
+  customers: AdminCustomerRow[]
+  onView: (customer: AdminCustomerRow) => void
+  onViewOrders: (customer: AdminCustomerRow) => void
+  onEdit: (customer: AdminCustomerRow) => void
+  onDisable: (customer: AdminCustomerRow) => void
+  onEnable: (customer: AdminCustomerRow) => void
+  /** Id of a customer with a request in flight — its actions are disabled until it settles. */
+  busyCustomerId?: string | null
 }
 
-function ActionsMenu({ customer, onView, onViewOrders, onEdit, onDisable, onEnable }: {
-  customer: AdminCustomer
-  onView: (customer: AdminCustomer) => void
-  onViewOrders: (customer: AdminCustomer) => void
-  onEdit: (customer: AdminCustomer) => void
-  onDisable: (customer: AdminCustomer) => void
-  onEnable: (customer: AdminCustomer) => void
-}) {
+function ActionsMenu({ customer, onView, onViewOrders, onEdit, onDisable, onEnable, busyCustomerId }: {
+  customer: AdminCustomerRow
+} & Omit<CustomersTableProps, "customers">) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={`Actions for ${customer.name}`}
+        disabled={busyCustomerId === customer._id}
         className="flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-expanded:bg-muted aria-expanded:text-foreground"
       >
         <MoreVertical className="size-4" />
@@ -80,7 +80,7 @@ function ActionsMenu({ customer, onView, onViewOrders, onEdit, onDisable, onEnab
 }
 
 /** Customers table — full table on desktop, stacked cards below `md` so nothing breaks on mobile. */
-function CustomersTable({ customers, onView, onViewOrders, onEdit, onDisable, onEnable }: CustomersTableProps) {
+function CustomersTable({ customers, ...actions }: CustomersTableProps) {
   return (
     <>
       <div className="hidden overflow-x-auto md:block">
@@ -99,18 +99,18 @@ function CustomersTable({ customers, onView, onViewOrders, onEdit, onDisable, on
           </thead>
           <tbody>
             {customers.map((customer) => (
-              <tr key={customer.id} className="border-b border-border transition-colors last:border-0 hover:bg-muted/50">
+              <tr key={customer._id} className="border-b border-border transition-colors last:border-0 hover:bg-muted/50">
                 <td className="px-3 py-3">
                   <div className="flex items-center gap-3">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={customer.avatar}
+                      src={customerAvatar(customer)}
                       alt={customer.name}
                       className="size-9 shrink-0 rounded-full object-cover ring-1 ring-foreground/10"
                     />
                     <div className="min-w-0">
                       <p className="truncate font-medium text-foreground">{customer.name}</p>
-                      <p className="text-caption text-muted-foreground">{customer.id}</p>
+                      <p className="text-caption text-muted-foreground">{shortCustomerId(customer._id)}</p>
                     </div>
                   </div>
                 </td>
@@ -123,16 +123,9 @@ function CustomersTable({ customers, onView, onViewOrders, onEdit, onDisable, on
                 <td className="px-3 py-3">
                   <Badge variant={statusBadgeVariant[customer.status]}>{statusLabel[customer.status]}</Badge>
                 </td>
-                <td className="px-3 py-3 text-muted-foreground">{formatCustomerDate(customer.joinedDate)}</td>
+                <td className="px-3 py-3 text-muted-foreground">{formatCustomerDate(customer.createdAt)}</td>
                 <td className="px-3 py-3 text-right">
-                  <ActionsMenu
-                    customer={customer}
-                    onView={onView}
-                    onViewOrders={onViewOrders}
-                    onEdit={onEdit}
-                    onDisable={onDisable}
-                    onEnable={onEnable}
-                  />
+                  <ActionsMenu customer={customer} {...actions} />
                 </td>
               </tr>
             ))}
@@ -142,27 +135,20 @@ function CustomersTable({ customers, onView, onViewOrders, onEdit, onDisable, on
 
       <div className="flex flex-col gap-3 md:hidden">
         {customers.map((customer) => (
-          <div key={customer.id} className="rounded-xl bg-card p-4 ring-1 ring-foreground/10 shadow-xs">
+          <div key={customer._id} className="rounded-xl bg-card p-4 ring-1 ring-foreground/10 shadow-xs">
             <div className="flex items-start gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={customer.avatar}
+                src={customerAvatar(customer)}
                 alt={customer.name}
                 className="size-11 shrink-0 rounded-full object-cover ring-1 ring-foreground/10"
               />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-small font-medium text-foreground">{customer.name}</p>
-                <p className="text-caption text-muted-foreground">{customer.id}</p>
+                <p className="text-caption text-muted-foreground">{shortCustomerId(customer._id)}</p>
                 <p className="truncate text-caption text-muted-foreground">{customer.email}</p>
               </div>
-              <ActionsMenu
-                customer={customer}
-                onView={onView}
-                onViewOrders={onViewOrders}
-                onEdit={onEdit}
-                onDisable={onDisable}
-                onEnable={onEnable}
-              />
+              <ActionsMenu customer={customer} {...actions} />
             </div>
 
             <div className="mt-3 grid grid-cols-2 gap-y-2.5 text-small">
@@ -180,7 +166,7 @@ function CustomersTable({ customers, onView, onViewOrders, onEdit, onDisable, on
               </div>
               <div>
                 <span className="block text-caption text-muted-foreground">Joined</span>
-                {formatCustomerDate(customer.joinedDate)}
+                {formatCustomerDate(customer.createdAt)}
               </div>
             </div>
 

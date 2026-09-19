@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { EmptyState } from "@/components/ui/empty-state"
-import { orderStatusLabel, type AdminOrderStatus } from "@/lib/mock/admin-orders"
+import { reportOrderStatusLabel, type ReportOrderStatus } from "@/lib/api-client/admin-reports"
 
-const barColorByStatus: Record<AdminOrderStatus, string> = {
+const barColorByStatus: Record<ReportOrderStatus, string> = {
   pending: "bg-warning",
   processing: "bg-ai",
   shipped: "bg-primary",
@@ -11,13 +11,13 @@ const barColorByStatus: Record<AdminOrderStatus, string> = {
 }
 
 export type OrderOverviewCardProps = {
-  breakdown: Record<AdminOrderStatus, number>
+  breakdown: Record<ReportOrderStatus, number>
   totalOrders: number
 }
 
 /** "Order Overview" — total + a status breakdown, as simple proportional bars (no new chart dependency). */
 function OrderOverviewCard({ breakdown, totalOrders }: OrderOverviewCardProps) {
-  const statuses = Object.entries(breakdown) as [AdminOrderStatus, number][]
+  const statuses = Object.entries(breakdown) as [ReportOrderStatus, number][]
 
   return (
     <Card>
@@ -31,7 +31,7 @@ function OrderOverviewCard({ breakdown, totalOrders }: OrderOverviewCardProps) {
             {statuses.map(([status, count]) => (
               <div key={status} className="flex flex-col gap-1">
                 <div className="flex items-center justify-between text-small">
-                  <span className="text-foreground">{status === "delivered" ? "Completed" : orderStatusLabel[status]}</span>
+                  <span className="text-foreground">{status === "delivered" ? "Completed" : reportOrderStatusLabel[status]}</span>
                   <span className="font-medium text-foreground">{count}</span>
                 </div>
                 <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">

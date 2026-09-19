@@ -1,6 +1,5 @@
 "use client"
 
-import { toast } from "sonner"
 import {
   Dialog,
   DialogContent,
@@ -16,12 +15,15 @@ export type DangerActionDialogProps = {
   title: string
   description: string
   confirmLabel: string
-  successMessage: string
   onClose: () => void
 }
 
-/** Generic destructive-action confirm dialog, reused for both "Disable Store" and "Delete Store". */
-function DangerActionDialog({ open, title, description, confirmLabel, successMessage, onClose }: DangerActionDialogProps) {
+/**
+ * Confirm dialog for the Danger Zone actions. Neither action exists in the application (there's no store-wide
+ * switch to save, and deleting a whole store is intentionally not supported), so the dialog explains that and the
+ * destructive button is disabled — nothing is performed and no success is claimed.
+ */
+function DangerActionDialog({ open, title, description, confirmLabel, onClose }: DangerActionDialogProps) {
   return (
     <Dialog open={open} onOpenChange={(next) => { if (!next) onClose() }}>
       <DialogContent className="sm:max-w-md">
@@ -32,18 +34,9 @@ function DangerActionDialog({ open, title, description, confirmLabel, successMes
 
         <DialogFooter>
           <Button variant="secondary" onClick={onClose}>
-            Cancel
+            Close
           </Button>
-          <Button
-            variant="outline"
-            className="border-destructive/40 text-destructive hover:bg-destructive/10"
-            onClick={() => {
-              onClose()
-              toast(`${confirmLabel} isn't wired up yet`, {
-                description: `This is a frontend-only demo — ${successMessage.toLowerCase()} was not actually performed.`,
-              })
-            }}
-          >
+          <Button variant="outline" className="border-destructive/40 text-destructive" disabled>
             {confirmLabel}
           </Button>
         </DialogFooter>

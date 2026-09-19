@@ -11,10 +11,15 @@ import {
 import { Rating } from "@/components/product/rating"
 import {
   formatReviewDate,
+  reviewProductImage,
   reviewStatusLabel,
-  type AdminReview,
+  reviewerAvatar,
+  type AdminReviewRow,
   type ReviewStatus,
-} from "@/lib/mock/admin-reviews"
+} from "@/lib/api-client/admin-reviews"
+
+const reviewerName = (review: AdminReviewRow) => review.customer?.name ?? "Unknown customer"
+const productName = (review: AdminReviewRow) => review.product?.name ?? "Unavailable product"
 
 const statusBadgeVariant: Record<ReviewStatus, "success" | "warning" | "outline"> = {
   published: "success",
@@ -23,24 +28,23 @@ const statusBadgeVariant: Record<ReviewStatus, "success" | "warning" | "outline"
 }
 
 export type ReviewsTableProps = {
-  reviews: AdminReview[]
-  onView: (review: AdminReview) => void
-  onPublish: (review: AdminReview) => void
-  onHide: (review: AdminReview) => void
-  onDelete: (review: AdminReview) => void
+  reviews: AdminReviewRow[]
+  onView: (review: AdminReviewRow) => void
+  onPublish: (review: AdminReviewRow) => void
+  onHide: (review: AdminReviewRow) => void
+  onDelete: (review: AdminReviewRow) => void
+  /** Id of a review with a request in flight — its actions are disabled until it settles. */
+  busyReviewId?: string | null
 }
 
-function ActionsMenu({ review, onView, onPublish, onHide, onDelete }: {
-  review: AdminReview
-  onView: (review: AdminReview) => void
-  onPublish: (review: AdminReview) => void
-  onHide: (review: AdminReview) => void
-  onDelete: (review: AdminReview) => void
-}) {
+function ActionsMenu({ review, onView, onPublish, onHide, onDelete, busyReviewId }: {
+  review: AdminReviewRow
+} & Omit<ReviewsTableProps, "reviews">) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        aria-label={`Actions for ${review.customerName}'s review`}
+        aria-label={`Actions for ${reviewerName(review)}'s review`}
+        disabled={busyReviewId === review._id}
         className="flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-expanded:bg-muted aria-expanded:text-foreground"
       >
         <MoreVertical className="size-4" />
@@ -71,7 +75,7 @@ function ActionsMenu({ review, onView, onPublish, onHide, onDelete }: {
 }
 
 /** Reviews table — full table on desktop, stacked cards below `md` so nothing breaks on mobile. */
-function ReviewsTable({ reviews, onView, onPublish, onHide, onDelete }: ReviewsTableProps) {
+function ReviewsTable({ reviews, ...actions }: ReviewsTableProps) {
   return (
     <>
       <div className="hidden overflow-x-auto md:block">
@@ -89,27 +93,27 @@ function ReviewsTable({ reviews, onView, onPublish, onHide, onDelete }: ReviewsT
           </thead>
           <tbody>
             {reviews.map((review) => (
-              <tr key={review.id} className="border-b border-border transition-colors last:border-0 hover:bg-muted/50">
+              <tr key={review._id} className="border-b border-border transition-colors last:border-0 hover:bg-muted/50">
                 <td className="px-3 py-3">
                   <div className="flex items-center gap-2.5">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={review.customerAvatar}
-                      alt={review.customerName}
+                      src={reviewerAvatar(review.customer)}
+                      alt={reviewerName(review)}
                       className="size-8 shrink-0 rounded-full object-cover ring-1 ring-foreground/10"
                     />
-                    <span className="font-medium text-foreground">{review.customerName}</span>
+                    <span className="font-medium text-foreground">{reviewerName(review)}</span>
                   </div>
                 </td>
                 <td className="px-3 py-3">
                   <div className="flex items-center gap-2.5">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={review.productImage}
-                      alt={review.productName}
+                      src={reviewProductImage(review)}
+                      alt={productName(review)}
                       className="size-9 shrink-0 rounded-lg object-cover ring-1 ring-foreground/10"
                     />
-                    <span className="max-w-40 truncate text-foreground">{review.productName}</span>
+                    <span className="max-w-40 truncate text-foreground">{productName(review)}</span>
                   </div>
                 </td>
                 <td className="px-3 py-3">
@@ -118,18 +122,18 @@ function ReviewsTable({ reviews, onView, onPublish, onHide, onDelete }: ReviewsT
                 <td className="px-3 py-3">
                   <button
                     type="button"
-                    onClick={() => onView(review)}
+                    onClick={() => actions.onView(review)}
                     className="line-clamp-2 max-w-64 text-left text-muted-foreground underline-offset-2 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:underline"
                   >
                     &ldquo;{review.comment}&rdquo;
                   </button>
                 </td>
-                <td className="px-3 py-3 text-muted-foreground">{formatReviewDate(review.date)}</td>
+                <td className="px-3 py-3 text-muted-foreground">{formatReviewDate(review.createdAt)}</td>
                 <td className="px-3 py-3">
                   <Badge variant={statusBadgeVariant[review.status]}>{reviewStatusLabel[review.status]}</Badge>
                 </td>
                 <td className="px-3 py-3 text-right">
-                  <ActionsMenu review={review} onView={onView} onPublish={onPublish} onHide={onHide} onDelete={onDelete} />
+                  <ActionsMenu review={review} {...actions} />
                 </td>
               </tr>
             ))}
@@ -139,43 +143,43 @@ function ReviewsTable({ reviews, onView, onPublish, onHide, onDelete }: ReviewsT
 
       <div className="flex flex-col gap-3 md:hidden">
         {reviews.map((review) => (
-          <div key={review.id} className="rounded-xl bg-card p-4 ring-1 ring-foreground/10 shadow-xs">
+          <div key={review._id} className="rounded-xl bg-card p-4 ring-1 ring-foreground/10 shadow-xs">
             <div className="flex items-start gap-3">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={review.customerAvatar}
-                alt={review.customerName}
+                src={reviewerAvatar(review.customer)}
+                alt={reviewerName(review)}
                 className="size-10 shrink-0 rounded-full object-cover ring-1 ring-foreground/10"
               />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-small font-medium text-foreground">{review.customerName}</p>
+                <p className="truncate text-small font-medium text-foreground">{reviewerName(review)}</p>
                 <div className="mt-0.5 flex items-center gap-2">
                   <Rating value={review.rating} size="sm" />
                   <Badge variant={statusBadgeVariant[review.status]}>{reviewStatusLabel[review.status]}</Badge>
                 </div>
               </div>
-              <ActionsMenu review={review} onView={onView} onPublish={onPublish} onHide={onHide} onDelete={onDelete} />
+              <ActionsMenu review={review} {...actions} />
             </div>
 
             <div className="mt-3 flex items-center gap-2.5 rounded-lg bg-muted/50 p-2.5">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={review.productImage}
-                alt={review.productName}
+                src={reviewProductImage(review)}
+                alt={productName(review)}
                 className="size-9 shrink-0 rounded-lg object-cover ring-1 ring-foreground/10"
               />
-              <span className="truncate text-small text-foreground">{review.productName}</span>
+              <span className="truncate text-small text-foreground">{productName(review)}</span>
             </div>
 
             <button
               type="button"
-              onClick={() => onView(review)}
+              onClick={() => actions.onView(review)}
               className="mt-2.5 line-clamp-2 text-left text-small text-muted-foreground underline-offset-2 hover:text-foreground hover:underline focus-visible:outline-none focus-visible:underline"
             >
               &ldquo;{review.comment}&rdquo;
             </button>
 
-            <p className="mt-2 text-caption text-muted-foreground">{formatReviewDate(review.date)}</p>
+            <p className="mt-2 text-caption text-muted-foreground">{formatReviewDate(review.createdAt)}</p>
           </div>
         ))}
       </div>

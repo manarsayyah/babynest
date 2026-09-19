@@ -1,19 +1,26 @@
 "use client"
 
 import * as React from "react"
-import { toast } from "sonner"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { LoginActivityDialog } from "@/components/admin/settings/login-activity-dialog"
+import { ChangePasswordDialog } from "@/components/admin/settings/change-password-dialog"
+import type { AdminSettings } from "@/lib/api-client/admin-settings"
 
-function notWiredUp(action: string) {
-  toast(`${action} isn't wired up yet`, { description: "This is a frontend-only demo." })
+export type SecuritySettingsSectionProps = {
+  account: AdminSettings["account"]
+  session: AdminSettings["session"]
 }
 
-/** "Security" — status only, no real auth is connected, so nothing here claims to be active. */
-function SecuritySettingsSection() {
+/**
+ * "Security" — Change Password is real (it changes the signed-in admin's own password). Two-factor authentication and
+ * signing out other devices need infrastructure the project doesn't have (no 2FA fields, no session store), so
+ * those controls are disabled and say so instead of pretending to work.
+ */
+function SecuritySettingsSection({ account, session }: SecuritySettingsSectionProps) {
   const [loginActivityOpen, setLoginActivityOpen] = React.useState(false)
+  const [passwordOpen, setPasswordOpen] = React.useState(false)
 
   return (
     <>
@@ -28,7 +35,7 @@ function SecuritySettingsSection() {
               <p className="text-small font-medium text-foreground">Password</p>
               <p className="text-caption text-muted-foreground">Last changed: not tracked yet</p>
             </div>
-            <Button variant="secondary" onClick={() => notWiredUp("Change Password")}>
+            <Button variant="secondary" onClick={() => setPasswordOpen(true)}>
               Change Password
             </Button>
           </div>
@@ -37,11 +44,13 @@ function SecuritySettingsSection() {
             <div className="flex items-center gap-2">
               <div>
                 <p className="text-small font-medium text-foreground">Two-Factor Authentication</p>
-                <p className="text-caption text-muted-foreground">Add an extra layer of security to admin sign-in.</p>
+                <p className="text-caption text-muted-foreground">
+                  Not available yet — the current sign-in system has no two-factor support.
+                </p>
               </div>
               <Badge variant="outline">Disabled</Badge>
             </div>
-            <Button variant="secondary" onClick={() => notWiredUp("Two-factor setup")}>
+            <Button variant="secondary" disabled>
               Enable 2FA
             </Button>
           </div>
@@ -49,7 +58,7 @@ function SecuritySettingsSection() {
           <div className="flex flex-wrap items-center justify-between gap-3 py-3">
             <div>
               <p className="text-small font-medium text-foreground">Login Activity</p>
-              <p className="text-caption text-muted-foreground">Review recent sign-ins to your admin account.</p>
+              <p className="text-caption text-muted-foreground">See the account and session you&apos;re signed in with.</p>
             </div>
             <Button variant="outline" onClick={() => setLoginActivityOpen(true)}>
               View Activity
@@ -59,16 +68,24 @@ function SecuritySettingsSection() {
           <div className="flex flex-wrap items-center justify-between gap-3 py-3 last:pb-0">
             <div>
               <p className="text-small font-medium text-foreground">Session Management</p>
-              <p className="text-caption text-muted-foreground">Sign out of other devices signed in to this account.</p>
+              <p className="text-caption text-muted-foreground">
+                Not available yet — sessions aren&apos;t stored, so other devices can&apos;t be signed out.
+              </p>
             </div>
-            <Button variant="outline" onClick={() => notWiredUp("Session management")}>
+            <Button variant="outline" disabled>
               Manage Sessions
             </Button>
           </div>
         </CardContent>
       </Card>
 
-      <LoginActivityDialog open={loginActivityOpen} onClose={() => setLoginActivityOpen(false)} />
+      <ChangePasswordDialog open={passwordOpen} onClose={() => setPasswordOpen(false)} />
+      <LoginActivityDialog
+        open={loginActivityOpen}
+        account={account}
+        session={session}
+        onClose={() => setLoginActivityOpen(false)}
+      />
     </>
   )
 }

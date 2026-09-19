@@ -9,7 +9,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { formatCategoryDate, type AdminCategory, type CategoryStatus } from "@/lib/mock/admin-categories"
+import {
+  categoryImage,
+  formatCategoryDate,
+  type AdminCategoryRow,
+  type CategoryStatus,
+} from "@/lib/api-client/admin-categories"
 
 const statusBadgeVariant: Record<CategoryStatus, "success" | "outline"> = {
   active: "success",
@@ -22,24 +27,23 @@ const statusLabel: Record<CategoryStatus, string> = {
 }
 
 export type CategoriesGridProps = {
-  categories: AdminCategory[]
-  onViewProducts: (category: AdminCategory) => void
-  onEdit: (category: AdminCategory) => void
-  onDisable: (category: AdminCategory) => void
-  onEnable: (category: AdminCategory) => void
+  categories: AdminCategoryRow[]
+  onViewProducts: (category: AdminCategoryRow) => void
+  onEdit: (category: AdminCategoryRow) => void
+  onDisable: (category: AdminCategoryRow) => void
+  onEnable: (category: AdminCategoryRow) => void
+  /** Id of a category with a request in flight — its actions are disabled until it settles. */
+  busyCategoryId?: string | null
 }
 
-function ActionsMenu({ category, onViewProducts, onEdit, onDisable, onEnable }: {
-  category: AdminCategory
-  onViewProducts: (category: AdminCategory) => void
-  onEdit: (category: AdminCategory) => void
-  onDisable: (category: AdminCategory) => void
-  onEnable: (category: AdminCategory) => void
-}) {
+function ActionsMenu({ category, onViewProducts, onEdit, onDisable, onEnable, busyCategoryId }: {
+  category: AdminCategoryRow
+} & Omit<CategoriesGridProps, "categories">) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={`Actions for ${category.name}`}
+        disabled={busyCategoryId === category._id}
         className="flex size-8 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 aria-expanded:bg-muted aria-expanded:text-foreground"
       >
         <MoreVertical className="size-4" />
@@ -70,25 +74,19 @@ function ActionsMenu({ category, onViewProducts, onEdit, onDisable, onEnable }: 
 }
 
 /** Category cards — image, name, description, product count, status, created date and an actions menu. */
-function CategoriesGrid({ categories, onViewProducts, onEdit, onDisable, onEnable }: CategoriesGridProps) {
+function CategoriesGrid({ categories, ...actions }: CategoriesGridProps) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
       {categories.map((category) => (
-        <Card key={category.slug} className="gap-3 p-4">
+        <Card key={category._id} className="gap-3 p-4">
           <div className="flex items-start justify-between gap-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={category.image}
+              src={categoryImage(category)}
               alt=""
               className="size-12 shrink-0 rounded-full object-cover ring-1 ring-foreground/10"
             />
-            <ActionsMenu
-              category={category}
-              onViewProducts={onViewProducts}
-              onEdit={onEdit}
-              onDisable={onDisable}
-              onEnable={onEnable}
-            />
+            <ActionsMenu category={category} {...actions} />
           </div>
 
           <div className="flex flex-col gap-1">
@@ -97,13 +95,20 @@ function CategoriesGrid({ categories, onViewProducts, onEdit, onDisable, onEnabl
               <Badge variant={statusBadgeVariant[category.status]}>{statusLabel[category.status]}</Badge>
             </div>
             <p className="line-clamp-2 text-small text-muted-foreground">{category.description}</p>
+            {category.parent ? (
+              <p className="text-caption text-muted-foreground">Subcategory of {category.parent.name}</p>
+            ) : category.childCount > 0 ? (
+              <p className="text-caption text-muted-foreground">
+                {category.childCount} {category.childCount === 1 ? "subcategory" : "subcategories"}
+              </p>
+            ) : null}
           </div>
 
           <div className="mt-1 flex items-center justify-between text-caption text-muted-foreground">
             <span className="font-medium text-foreground">
               {category.productCount} {category.productCount === 1 ? "product" : "products"}
             </span>
-            <span>Created {formatCategoryDate(category.createdDate)}</span>
+            <span>Created {formatCategoryDate(category.createdAt)}</span>
           </div>
         </Card>
       ))}
