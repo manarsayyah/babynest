@@ -47,6 +47,7 @@ import Review from "../models/Review"
 import Notification from "../models/Notification"
 import AiSearchQuery from "../models/AiSearchQuery"
 import AiRecommendation from "../models/AiRecommendation"
+import { hasPhoto, productImageUrl } from "./product-images"
 
 const SALT_ROUNDS = 12
 const SEED_EMAIL_DOMAIN = "@seed.babynest.test"
@@ -160,7 +161,7 @@ const PRODUCTS: P[] = [
 const skuOf = (p: P, vv: V) => `SD-${p.code}-${vv.key}`
 
 const CUSTOMERS = [
-  { first: "Layla", last: "Haddad", phone: "+961 3 112 233", city: "Beirut", state: "Beirut", street: "Hamra Street 45", apt: "Apt 3B", postal: "1103", joined: 118 },
+  { first: "Layla", last: "Haddad", email: "customer@babynest.com", password: "customer@12345", phone: "+961 3 112 233", city: "Beirut", state: "Beirut", street: "Hamra Street 45", apt: "Apt 3B", postal: "1103", joined: 118 },
   { first: "Omar", last: "Khoury", phone: "+961 70 224 455", city: "Jounieh", state: "Mount Lebanon", street: "Maameltein Road 12", apt: "Floor 2", postal: "1200", joined: 110 },
   { first: "Nour", last: "Mansour", phone: "+961 71 335 677", city: "Tripoli", state: "North Lebanon", street: "Al Mina Street 8", apt: "Apt 5", postal: "1300", joined: 104 },
   { first: "Karim", last: "Saade", phone: "+961 3 446 880", city: "Sidon", state: "South Lebanon", street: "Riad El Solh Street 21", apt: "Apt 1A", postal: "1600", joined: 96 },
@@ -171,7 +172,7 @@ const CUSTOMERS = [
   { first: "Lina", last: "Abboud", phone: "+961 3 991 345", city: "Beirut", state: "Beirut", street: "Achrafieh Sassine 60", apt: "Apt 8D", postal: "1100", joined: 38 },
   { first: "Tarek", last: "Sleiman", phone: "+961 76 102 456", city: "Jounieh", state: "Mount Lebanon", street: "Kaslik Main Road 4", apt: "Floor 1", postal: "1200", joined: 24 },
 ]
-const emailOf = (c: (typeof CUSTOMERS)[number]) => `${c.first}.${c.last}`.toLowerCase() + SEED_EMAIL_DOMAIN
+const emailOf = (c: (typeof CUSTOMERS)[number]) => c.email ?? `${c.first}.${c.last}`.toLowerCase() + SEED_EMAIL_DOMAIN
 // Second (non-default) addresses for some customers, by customer index.
 const EXTRA_ADDRESSES: Record<number, { label: "Work" | "Other"; street: string; apt: string; city: string; state: string; postal: string }> = {
   0: { label: "Work", street: "Verdun Street 102", apt: "Office 7", city: "Beirut", state: "Beirut", postal: "1107" },
@@ -307,7 +308,9 @@ async function main() {
   const conn = await connectToDatabase()
   try {
     // ---- Reset (seed-scoped only) ----
-    const seedUsers = await User.find({ email: { $regex: `${SEED_EMAIL_DOMAIN.replace(".", "\\.")}$` } }).select("_id email password").lean()
+    const seedEmailRegex = `${SEED_EMAIL_DOMAIN.replace(".", "\\.")}$`
+    // The first customer uses customer@babynest.com, outside the seed domain, so include it in the reset scope.
+    const seedUsers = await User.find({ $or: [{ email: { $regex: seedEmailRegex } }, { email: emailOf(CUSTOMERS[0]) }] }).select("_id email password").lean()
     const seedUserIds = seedUsers.map((u) => u._id)
     const seedOrders = await Order.find({ orderNumber: { $regex: `^${ORDER_PREFIX}` } }).select("_id").lean()
     const seedOrderIds = seedOrders.map((o) => o._id)
@@ -325,14 +328,15 @@ async function main() {
     }
 
     // ---- Users ----
-    const passwordHash = await bcrypt.hash(SEED_PASSWORD, SALT_ROUNDS)
-    const upsertUser = async (first: string, last: string, email: string, role: "admin" | "customer", createdAt: Date) => {
+    // The first customer was renamed to customer@babynest.com; drop its old seed-domain account.
+    await User.deleteOne({ email: `layla.haddad${SEED_EMAIL_DOMAIN}` })
+    const upsertUser = async (first: string, last: string, email: string, role: "admin" | "customer", createdAt: Date, password = SEED_PASSWORD) => {
       const existing = seedUsers.find((u) => u.email === email)
-      const keepHash = existing ? await bcrypt.compare(SEED_PASSWORD, existing.password) : false
+      const keepHash = existing ? await bcrypt.compare(password, existing.password) : false
       const user = await User.findOneAndUpdate(
         { email },
         {
-          $set: { firstName: first, lastName: last, role, deletedAt: null, password: keepHash && existing ? existing.password : passwordHash },
+          $set: { firstName: first, lastName: last, role, deletedAt: null, password: keepHash && existing ? existing.password : await bcrypt.hash(password, SALT_ROUNDS) },
           $setOnInsert: { createdAt, updatedAt: createdAt },
         },
         { upsert: true, returnDocument: "after", setDefaultsOnInsert: true, timestamps: false }
@@ -341,7 +345,7 @@ async function main() {
     }
     const adminUser = await upsertUser("Sara", "Mitri", `admin${SEED_EMAIL_DOMAIN}`, "admin", at(130))
     const users = []
-    for (const c of CUSTOMERS) users.push(await upsertUser(c.first, c.last, emailOf(c), "customer", at(c.joined, 9)))
+    for (const c of CUSTOMERS) users.push(await upsertUser(c.first, c.last, emailOf(c), "customer", at(c.joined, 9), c.password))
 
     // ---- Addresses ----
     const addressIds: mongoose.Types.ObjectId[][] = CUSTOMERS.map(() => [])
@@ -417,13 +421,16 @@ async function main() {
         { upsert: true, returnDocument: "after", setDefaultsOnInsert: true }
       )
       productIds.set(p.code, productDoc!._id)
-      for (let i = 0; i < 2; i++) {
+      // A product with a real photo (see product-images.ts) gets that single photo; others keep two placeholders.
+      const photo = hasPhoto(p.slug)
+      for (let i = 0; i < (photo ? 1 : 2); i++) {
         await ProductImage.findOneAndUpdate(
           { productId: productDoc!._id, variantId: null, displayOrder: i },
-          { $set: { imageUrl: buildImageUrl(p.name, i), altText: p.name, isPrimary: i === 0, deletedAt: null } },
+          { $set: { imageUrl: productImageUrl(p.slug, p.name, i), altText: p.name, isPrimary: i === 0, deletedAt: null } },
           { upsert: true, setDefaultsOnInsert: true }
         )
       }
+      if (photo) await ProductImage.deleteMany({ productId: productDoc!._id, variantId: null, displayOrder: { $gte: 1 } })
       const colorsWithImage = new Set<string>()
       for (const vv of p.variants) {
         const sku = skuOf(p, vv)
@@ -438,7 +445,7 @@ async function main() {
           colorsWithImage.add(vv.color)
           await ProductImage.findOneAndUpdate(
             { productId: productDoc!._id, variantId: variantDoc!._id, displayOrder: 0 },
-            { $set: { imageUrl: buildImageUrl(`${p.name} ${vv.color}`, 0), altText: `${p.name} — ${vv.color}`, isPrimary: true, deletedAt: null } },
+            { $set: { imageUrl: productImageUrl(p.slug, `${p.name} ${vv.color}`, 0, vv.color), altText: `${p.name} — ${vv.color}`, isPrimary: true, deletedAt: null } },
             { upsert: true, setDefaultsOnInsert: true }
           )
         } else {

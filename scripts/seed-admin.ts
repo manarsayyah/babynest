@@ -29,20 +29,16 @@ async function main() {
   const mongoose = await connectToDatabase()
 
   try {
+    const hashedPassword = await bcrypt.hash(adminPassword, SALT_ROUNDS)
     const existing = await User.findOne({ email: adminEmail })
 
     if (existing) {
-      if (existing.role === "admin") {
-        console.log(`Admin account already exists for ${adminEmail}. No changes made.`)
-      } else {
-        existing.role = "admin"
-        await existing.save()
-        console.log(`Existing account for ${adminEmail} promoted to role "admin".`)
-      }
+      existing.role = "admin"
+      existing.password = hashedPassword
+      await existing.save()
+      console.log(`Admin account for ${adminEmail} updated (role "admin", password re-hashed).`)
       return
     }
-
-    const hashedPassword = await bcrypt.hash(adminPassword, SALT_ROUNDS)
 
     await User.create({
       firstName: "BabyNest",

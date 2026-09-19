@@ -30,8 +30,6 @@ export type OrderSummaryProps = {
   className?: string
 }
 
-const PAYMENT_METHODS = ["Visa", "Mastercard", "Amex", "PayPal"]
-
 /** "Order Summary" card — subtotal/shipping/discount/total, promo code, checkout CTA. */
 function OrderSummary({
   subtotal,
@@ -146,14 +144,10 @@ function OrderSummary({
         )}
 
         <div className="flex flex-col items-center gap-2 pt-1">
-          <span className="text-caption text-muted-foreground">We accept</span>
-          <div className="flex flex-wrap items-center justify-center gap-1.5">
-            {PAYMENT_METHODS.map((method) => (
-              <Badge key={method} variant="outline" className="text-muted-foreground">
-                {method}
-              </Badge>
-            ))}
-          </div>
+          <span className="text-caption text-muted-foreground">Payment method</span>
+          <Badge variant="outline" className="text-muted-foreground">
+            Cash on Delivery
+          </Badge>
         </div>
       </CardContent>
     </Card>

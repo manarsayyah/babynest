@@ -24,6 +24,7 @@ import Product from "../models/Product"
 import ProductVariant from "../models/ProductVariant"
 import ProductImage from "../models/ProductImage"
 import ProductTag from "../models/ProductTag"
+import { hasPhoto, productImageUrl } from "./product-images"
 
 // ---------------------------------------------------------------------------
 // Seed data
@@ -639,18 +640,21 @@ async function main() {
       const product = await upsertProduct(seed, categoryId)
       const productId = product._id.toString()
 
-      // Base product-level images (no variant).
-      const imageCount = seed.imageCount ?? 1
+      // Base product-level images (no variant). A product with a real photo (see product-images.ts) gets that single
+      // photo; every other product keeps the BabyNest placeholder(s).
+      const photo = hasPhoto(seed.slug)
+      const imageCount = photo ? 1 : (seed.imageCount ?? 1)
       for (let i = 0; i < imageCount; i++) {
         await upsertImage({
           productId,
           variantId: null,
-          imageUrl: buildImageUrl(seed.name, i),
+          imageUrl: productImageUrl(seed.slug, seed.name, i),
           altText: seed.name,
           displayOrder: i,
           isPrimary: i === 0,
         })
       }
+      if (photo) await ProductImage.deleteMany({ productId, variantId: null, displayOrder: { $gte: 1 } })
 
       // Variants (+ one variant-linked image each, where requested).
       for (const variantSeed of seed.variants ?? []) {
@@ -661,7 +665,7 @@ async function main() {
           await upsertImage({
             productId,
             variantId: variant._id.toString(),
-            imageUrl: buildImageUrl(`${seed.name} ${label}`, 0),
+            imageUrl: productImageUrl(seed.slug, `${seed.name} ${label}`, 0, label),
             altText: `${seed.name} — ${label}`,
             displayOrder: 0,
             isPrimary: true,
