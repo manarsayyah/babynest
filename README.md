@@ -1,217 +1,377 @@
-# BabyNest
+# 🍼 BabyNest — AI-Powered Baby Products E-Commerce Platform
 
-An AI-powered baby-products e-commerce platform built with Next.js and MongoDB.
+BabyNest is a modern, AI-powered e-commerce platform designed specifically for baby products. It provides a complete shopping experience for customers and an administration area for managing products, categories, customers, orders, reviews, inventory-related information and AI-driven insights.
 
-## Project Overview
+The project was developed as a **Full Stack Development Capstone Project** with a focus on modern web technologies, clean architecture, responsive UI, authentication, REST-style APIs, MongoDB data modeling and AI-powered features.
 
-BabyNest is a full-stack web application with two sides:
+---
 
-- **Customer storefront** – browse a real product catalog (categories, variants, images, tags), search and filter, keep a wishlist and cart, save delivery addresses, check out with **Cash on Delivery**, follow orders and shipments, request returns, write reviews, receive notifications, and discover products with AI-assisted search and recommendations.
-- **Admin back office** – manage products, orders, customers, categories and reviews, and review dashboards, reports and AI-driven store insights.
+## 🎯 Project Overview
 
-All storefront and admin data comes from MongoDB through Next.js API routes. Payment is **Cash on Delivery only**.
+BabyNest gives parents and caregivers a simple and personalized way to discover and purchase baby products.
 
-## Features
+The platform supports:
 
-### Customer
+* Product browsing and discovery, categories, filtering and search
+* Product variants (color / size), images and tags
+* Shopping cart and wishlist
+* Saved addresses
+* Checkout with **Cash on Delivery (COD)**
+* Orders, shipment/tracking information and status history
+* Return requests
+* Product reviews with moderation
+* Customer notifications
+* Secure authentication with customer and admin roles
+* Admin management (products, orders, customers, categories, reviews)
+* AI-powered product search, recommendations and a product assistant
+* Admin dashboard, reports and AI insights computed from real data
 
-- Registration and login (email + password)
-- Product browsing, categories, product detail pages with variants (color/size), images and tags
-- Search and filters: text, category, price range, age group, brand, minimum rating, availability (based on variant stock), sorting and pagination
-- Wishlist and cart (server-side, per customer) with live variant stock validation
-- Saved addresses with a default address
-- Checkout with Cash on Delivery: server-calculated totals, shipping rule, optional promotion code, stock deduction, order confirmation
-- Orders list and order detail: status, payment status, shipment/tracking information, status history
-- Return requests for delivered orders (create and cancel a pending request)
-- Product reviews (verified-purchase flag when the customer received the product, moderation before publication)
-- Notifications (order, shipment and return updates) with read/unread state
-- Account overview showing the customer's real name, email, orders and wishlist counts, recent orders and default address
-- AI Smart Search, personalized recommendations and AI preferences (see [AI](#ai))
+All storefront and admin data comes from MongoDB through Next.js API routes.
 
-### Admin
+---
 
-- **Dashboard** – sales, orders, customers and products summary, sales trend, top products, recent orders, fact-based highlights
-- **Products** – list, search, filters, create/edit, variants, images, tags, activate/deactivate, delete
-- **Orders** – list, search, filters, status updates, shipment and payment (COD) updates, status history
-- **Customers** – list, search, sorting, details, real order counts and spend
-- **Categories** – hierarchy (parent/child), status, create/edit/delete with product-dependency protection
-- **Reviews** – moderation (publish / hide / delete), product rating kept consistent
-- **AI Insights** – store insights and recommendations computed from real sales, stock and customer data
-- **Reports** – date-range and category-scoped sales, order, product, customer and inventory reports
-- **Settings** – read-only store information, change own admin password
+# ✨ Main Features
 
-Also available as API endpoints (without a dedicated admin screen): admin return management, promotions management and admin notifications.
+## 🛍️ Customer Features
 
-## AI
+### Home Page
 
-AI features are server-side only and use the **Anthropic** provider through the Vercel AI SDK (`ai` and `@ai-sdk/anthropic`).
+* Hero section, featured categories and featured products
+* AI search section and recommendation section
+* Trust/service information and newsletter section
 
-- **Smart Search / Product Matching** (`POST /api/ai/search`) – turns a natural-language request into matches chosen from real, active catalog products.
-- **Personalized Recommendations** (`GET /api/ai/recommendations`) – uses the signed-in customer's own orders, wishlist and cart as signals; results are limited to real, active products.
-- **Product Assistant** (`POST /api/ai/assistant`) – product discovery and recommendation only. It is instructed **not to give medical advice**; if a message describes a medical concern it flags it and only offers general shopping guidance. The endpoint exists in the API; the storefront UI currently uses Smart Search and Recommendations.
-- **AI Preferences** – the customer's preference choices are stored in the browser (`localStorage`) and used to build searches; they are not stored in the database.
-- **Persistence** – signed-in AI searches are saved as AI search query records, and recommendations are saved as AI recommendation records (one per customer/product, refreshed in place).
-- **Admin AI Insights** – rule-based insights computed from database figures, not generated by a model.
+### Product Catalog
 
-Live AI responses require an Anthropic API key (`ANTHROPIC_API_KEY`). Without it, the AI endpoints return a clear "not configured" error and never fabricate results; the rest of the application works normally. The key is read from the server environment only and is never sent to the browser.
+* Browse all products and categories
+* Product detail pages with images, variants (color/size), tags, ratings and reviews
+* Filters: text search, category, price range, age group, brand, minimum rating, availability (based on real variant stock)
+* Sorting and pagination
 
-## Tech Stack
+### Shopping Cart
 
-- **Framework:** Next.js 16 (App Router), React 19, TypeScript
-- **Styling / UI:** Tailwind CSS 4, shadcn/ui-style components on Base UI, lucide-react icons, Sonner toasts
-- **Database:** MongoDB with Mongoose 9
-- **Authentication:** Auth.js (`next-auth` v5 beta) with the Credentials provider and JWT sessions; passwords hashed with `bcryptjs`
-- **Validation:** Zod
-- **AI:** Vercel AI SDK (`ai`) with `@ai-sdk/anthropic`
-- **Tooling:** ESLint, `tsx` (seed scripts), Node.js/npm
+* Add products (by variant), update quantities, remove items
+* Live stock validation, variant price differences and shipping calculation
+* Order summary
 
-## Architecture
+### Wishlist
 
-**Frontend.** The Next.js App Router serves the customer pages (route groups `(shop)` and `(account)`) and the admin pages under `/admin`. Pages are composed from reusable components in `components/`, and talk to the backend through small typed clients in `lib/api-client/`.
+* Add and remove products, persisted per customer
 
-**Backend.** Business logic lives in Next.js API routes under `app/api/`. Each route authenticates the caller, authorizes by role, validates input with Zod schemas (`lib/validation/`) and then reads/writes MongoDB through Mongoose models. Customer routes always scope data to the signed-in user; admin routes are restricted to the `admin` role. Checkout, inventory and rating logic is shared in `lib/api/`.
+### Checkout
 
-**Data.** MongoDB collections are normalized, with relationships stored as document IDs. Documents carry `createdAt`/`updatedAt` timestamps, and most entities use a `deletedAt` field for soft deletion. Order-related data (items, payment, shipment, status history, promotions) is stored in separate collections linked to the order.
+* Contact information, saved-address selection and order summary
+* **Cash on Delivery** as the payment method
+* Optional promotion code
+* Server-calculated subtotal, discount, shipping and total; stock is deducted at checkout
+* Order confirmation
 
-**AI.** The AI provider is accessed only from server code. Search queries and recommendations are persisted in their own collections.
+### Orders
 
-## Database
+* Order list and order details
+* Order status, payment status, shipment and tracking information, and status history
+* Return requests for delivered orders (a pending request can be cancelled)
+* Product reviews (a verified-purchase flag is set when the customer received the product)
 
-24 Mongoose models in `models/`, MongoDB database (default name `babynest`):
+## 👤 Customer Account
+
+* **Account overview** with the customer's real name, email, order and wishlist counts, recent orders and default address
+* **Addresses** – add, edit, delete and set a default address
+* **Orders** and **Notifications** (order, shipment and return updates, with read/unread state)
+* **AI Preferences** (stored in the browser)
+* Personal Information, Payment Methods and Account Settings pages exist as frontend-only screens (see [Known Limitations](#-known-limitations))
+
+---
+
+# 🤖 AI Features
+
+AI features run **server-side only** and use the **Anthropic** provider through the Vercel AI SDK (`ai` and `@ai-sdk/anthropic`).
+
+* **AI-Powered Search / Product Matching** (`POST /api/ai/search`) – natural-language requests such as *"Find comfortable products for a newborn"* are matched to real, active catalog products.
+* **AI Recommendations** (`GET /api/ai/recommendations`) – based on the signed-in customer's own orders, wishlist and cart; results are limited to real, active products.
+* **AI Baby Product Assistant** (`POST /api/ai/assistant`) – product discovery and shopping assistance only. It is instructed **not to provide medical advice**; medical concerns are flagged and answered only with general shopping guidance. The endpoint is available in the API; the storefront UI currently exposes Smart Search and Recommendations.
+* **AI Preferences** – preference choices are kept in the browser (`localStorage`) and used to build searches; they are not stored in the database.
+* **Persistence** – signed-in AI searches are saved as AI search query records, and recommendations as AI recommendation records (one per customer and product, refreshed in place).
+* **AI Insights (admin)** – rule-based insights computed from real sales, stock and customer data (not generated by a model).
+
+> **Live AI responses require an Anthropic API key** (`ANTHROPIC_API_KEY`). Without it, the AI endpoints return a clear "not configured" error and never fabricate results; the rest of the application works normally. The key is read from the server environment only and is never sent to the browser.
+
+---
+
+# 👨‍💼 Admin Dashboard
+
+The admin area (`/admin`) provides:
+
+* **Dashboard** – sales, orders, customers and products summary, sales trend, top products, recent orders and fact-based highlights
+* **Products** – list, search, filters, create/edit, variants, images, tags, activate/deactivate and delete
+* **Categories** – parent/child hierarchy, status, create/edit/delete (deletion is blocked while a category still has products)
+* **Customers** – list, search, sorting, details, real order counts and spend, account status
+* **Orders** – list, search, filters, sorting, details, status updates, shipment and payment (COD) updates, status history
+* **Reviews** – list, filters, details, publish / hide / delete; product rating stays consistent
+* **AI Insights** – product, customer, inventory and sales insights and recommendation opportunities
+* **Reports** – date-range and category-scoped sales, order, product, customer and inventory reports
+* **Settings** – read-only store information and change of the signed-in admin's own password
+
+Return management, promotions management and admin notifications are available as API endpoints without a dedicated admin screen.
+
+**Inventory definition:** Dashboard, Reports and AI Insights share one definition based on variant stock — *out of stock* when every variant is at 0, *low stock* when any variant is at or below the threshold of 10.
+
+---
+
+# 🔐 Authentication & Authorization
+
+* **Auth.js** (`next-auth` v5 beta) with the Credentials provider and JWT sessions
+* Passwords hashed with **bcryptjs**; the session never carries the hash
+* Identity and role always come from the server-side session — a `userId` or `role` sent by the client is ignored
+* `proxy.ts` redirects unauthenticated visitors away from account and admin pages, and non-admins away from `/admin`
+* Every API route checks authentication; admin routes require the `admin` role (401 for anonymous, 403 for customers)
+* Customer resources (orders, addresses, cart, wishlist, returns, reviews, notifications) are ownership-checked
+* Server-side validation with **Zod**; ObjectIds are validated and search input is regex-escaped
+* Prices, discounts, shipping and totals are always calculated on the server
+
+---
+
+# 🗄️ Database
+
+BabyNest uses **MongoDB** with **Mongoose** (24 models in `models/`). Relationships are stored as document IDs, documents carry `createdAt` / `updatedAt` timestamps, and soft deletion (`deletedAt`) is used where needed (for example users, addresses, categories, products, variants, orders, shipments, returns). Review moderation uses a `status` field; `OrderStatusHistory` uses its own `changedAt`.
 
 | Area | Models |
 |---|---|
 | Users | `User` (role: customer / admin) |
 | Customer data | `Address`, `WishlistItem`, `Cart`, `CartItem`, `Notification` |
-| Catalog | `Category` (parent/child), `Product`, `ProductVariant`, `ProductImage`, `Tag`, `ProductTag` |
-| Orders | `Order`, `OrderItem`, `Payment` (Cash on Delivery), `Shipment`, `OrderStatusHistory` |
+| Catalog | `Category`, `Product`, `ProductVariant`, `ProductImage`, `Tag`, `ProductTag` |
+| Orders | `Order`, `OrderItem`, `Payment`, `Shipment`, `OrderStatusHistory` |
 | Returns | `Return`, `ReturnItem` |
 | Promotions | `Promotion`, `OrderPromotion` |
 | Reviews | `Review` |
 | AI | `AiSearchQuery`, `AiRecommendation` |
 
-Soft-delete (`deletedAt`) is used by the entities that need it (for example users, addresses, categories, products, variants, orders, shipments, returns). Review moderation uses a `status` field instead. `OrderStatusHistory` records status changes with its own `changedAt` timestamp.
+---
 
-## Authentication & Security
+# 💳 Payment
 
-- Credentials login with JWT sessions; the session carries only id, name, email and role – never the password hash.
-- Passwords are hashed with bcrypt.
-- Identity and role always come from the server-side session. `userId`, `role` and similar values sent by the client are ignored.
-- `proxy.ts` redirects unauthenticated visitors away from account and admin pages, and non-admins away from `/admin`.
-- Every API route checks authentication; admin routes require the `admin` role (401 for anonymous, 403 for customers).
-- Customer resources (orders, addresses, cart, wishlist, returns, reviews, notifications) are ownership-checked; another customer's resource returns not found/forbidden.
-- Inputs are validated server-side and ObjectIds are validated before queries; search input is regex-escaped.
-- Prices, discounts, shipping and totals are always calculated on the server.
-- Secrets live in environment variables and are never exposed to client code.
-
-## Payment
-
-**Cash on Delivery (COD) is the only payment method.** A payment record is created with each order, starting as `pending`, and is marked `paid` by an admin. No card data, payment gateway or online payment is involved.
+**Cash on Delivery (COD) is the only payment method.** Every order gets one payment record that starts as `pending` and is marked `paid` by an admin. No card data or online payment processing is involved.
 
 Shipping is a flat fee below a free-shipping threshold, and no tax is applied.
 
-## Seed / Demo Data
+---
 
-Three scripts are available:
+# 📦 Order & Shipment Management
 
-| Command | Purpose |
-|---|---|
-| `npm run seed:admin` | Creates or promotes the admin account defined by `ADMIN_EMAIL` / `ADMIN_PASSWORD` |
-| `npm run seed:catalog` | Adds a base catalog of categories, tags, products, variants and images (idempotent, never deletes) |
-| `npm run seed:demo` | Adds a realistic, interconnected demo dataset |
+* Order creation from the cart, with order items priced on the server
+* Order status: pending → processing → shipped → delivered (or cancelled by an admin), with full status history
+* Payment record (COD) and shipment information (carrier, tracking number, shipment cost, estimated delivery)
+* Return requests and return items for delivered orders, handled by admins through the API
+* Customer notifications for order, shipment and return updates
 
-`seed:demo` creates demo customers and an admin, addresses, additional categories/tags/products with variants and images, carts, wishlists, promotions, orders with items, payments, shipments and status history, returns, reviews, notifications, and AI search/recommendation records, with dates spread over the last months so the dashboard and reports show meaningful trends.
+---
 
-- **Repeatable:** re-running it rebuilds only the data it owns. Demo users use the `@seed.babynest.test` email domain, demo orders use the `ORD-SEED-` prefix, and demo variants use the `SD-` SKU prefix.
-- **Safe:** it never deletes real data and refuses to update an existing product that it does not own, so non-seed catalog data is preserved.
-- **Not exposed:** it is a command-line tool only; no page or API route can run it.
-- **Demo credentials:** the demo accounts' password is defined inside `scripts/seed-demo.ts` (and printed when the script finishes). It is for local demo data only. The admin account you sign in with for real use is the one created by `seed:admin` from your own `.env.local`.
+# ⭐ Reviews & Ratings
 
-## Installation / Setup
+* Customers can review products; reviews start as **pending** and are published by an admin
+* A review is marked as a **verified purchase** when the customer received the product
+* Hidden, pending and deleted reviews are excluded from public listings
+* A product's rating and review count are derived from its published reviews
+
+---
+
+# 🏷️ Product Structure
+
+Products have a name, slug, description, brand, material, age group, price, rating, review count, category, active status, images, variants and tags.
+
+* **Variants** carry color, size, SKU, price difference and stock quantity
+* **Tags** classify products (for example Organic, BPA-Free, Eco-Friendly)
+* Availability is based on real variant stock
+
+---
+
+# 🛠️ Technologies Used
+
+**Frontend:** Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS 4, Base UI-based shadcn-style components, lucide-react, Sonner
+
+**Backend:** Next.js API Routes (REST-style), Node.js, MongoDB, Mongoose 9
+
+**Authentication & Security:** Auth.js (`next-auth` v5 beta), bcryptjs, Zod, role-based authorization
+
+**AI:** Vercel AI SDK (`ai`) with `@ai-sdk/anthropic`
+
+**Tooling:** ESLint, `tsx` (seed scripts), Git, GitHub, npm
+
+---
+
+# 📁 Project Structure
+
+```text
+babynest/
+├── app/
+│   ├── (account)/     # login, register, account, addresses, notifications, ...
+│   ├── (shop)/        # products, categories, cart, checkout, orders, search, wishlist
+│   ├── admin/         # dashboard, products, orders, customers, categories,
+│   │                  # reviews, ai-insights, reports, settings
+│   └── api/           # REST-style API routes (customer, admin, ai, auth, ...)
+├── components/        # account, admin, ai, auth, checkout, home, layout,
+│                      # orders, product, search, shop, ui, wishlist
+├── lib/               # ai, api (business logic), api-client, validation, db
+├── models/            # 24 Mongoose models
+├── scripts/           # seed-admin.ts, seed-catalog.ts, seed-demo.ts
+├── public/            # static assets
+├── auth.ts            # Auth.js configuration
+├── proxy.ts           # route protection for account and admin pages
+└── package.json
+```
+
+---
+
+# 🔄 Main User Flow
+
+```text
+Visitor → Home → Browse / Search / AI Product Discovery
+        → Product Listing → Product Details → Wishlist / Cart
+        → Checkout (address + Cash on Delivery) → Order Confirmation
+        → My Orders → Order Details / Tracking / Return / Review
+```
+
+# 🔄 Admin Flow
+
+```text
+Admin Login → Dashboard → Products → Categories → Customers → Orders
+            → Reviews → AI Insights → Reports → Settings
+```
+
+---
+
+# 🔌 API Structure
+
+Route handlers under `app/api/` include:
+
+```text
+/api/auth          /api/products      /api/categories    /api/cart
+/api/orders        /api/wishlist      /api/addresses     /api/reviews
+/api/returns       /api/notifications /api/tags          /api/variants
+/api/promotions    /api/ai            /api/admin
+```
+
+The API layer provides authentication checks, Zod validation, response helpers, pagination and reusable business logic (checkout, inventory, ratings).
+
+---
+
+# 🚀 Getting Started
 
 1. **Clone**
+
    ```bash
    git clone https://github.com/manarsayyah/babynest.git
    cd babynest
    ```
+
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
-3. **Create `.env.local`** in the project root with these variables (values are yours – do not commit this file):
+
+3. **Create `.env.local`** in the project root (never commit it):
 
    | Variable | Required | Purpose |
    |---|---|---|
-   | `MONGODB_URI` | Yes | MongoDB connection string, e.g. a local `mongodb://127.0.0.1:27017/babynest` |
+   | `MONGODB_URI` | Yes | MongoDB connection string (for example a local `mongodb://127.0.0.1:27017/babynest`) |
    | `AUTH_SECRET` | Yes | Secret used by Auth.js to sign sessions |
    | `ADMIN_EMAIL` | For `seed:admin` | Email of the admin account to create |
    | `ADMIN_PASSWORD` | For `seed:admin` | Password of the admin account to create |
-   | `ANTHROPIC_API_KEY` | For live AI | Enables AI Smart Search, Recommendations and the Assistant |
+   | `ANTHROPIC_API_KEY` | For live AI | Enables AI search, recommendations and the assistant |
    | `ANTHROPIC_MODEL` | Optional | Overrides the default Anthropic model |
 
-4. **Start MongoDB** (a local MongoDB server or a hosted MongoDB instance reachable through `MONGODB_URI`).
-5. **Seed the database** (optional but recommended for a demo):
+4. **Start MongoDB** (local server, optionally managed with MongoDB Compass, or a hosted instance).
+
+5. **Seed the database** (optional but recommended):
+
    ```bash
    npm run seed:admin
    npm run seed:catalog
    npm run seed:demo
    ```
+
 6. **Start the development server**
+
    ```bash
    npm run dev
    ```
-7. **Open** [http://localhost:3000](http://localhost:3000).
 
-## Running the Project
+   Then open [http://localhost:3000](http://localhost:3000).
+
+---
+
+# 👨‍💻 Development Commands
 
 | Command | Description |
 |---|---|
 | `npm run dev` | Start the development server |
 | `npm run build` | Create a production build |
-| `npm start` | Run the production build |
-| `npm run lint` | Run ESLint |
-| `npx tsc --noEmit` | Type-check the project |
-| `npm run seed:admin` / `seed:catalog` / `seed:demo` | Seed the database (see above) |
+| `npm start` | Run the production server |
+| `npm run lint` | Run ESLint (`npx eslint .` also works) |
+| `npx tsc --noEmit` | TypeScript check |
+| `npm run seed:admin` | Create/promote the admin from `ADMIN_EMAIL` / `ADMIN_PASSWORD` |
+| `npm run seed:catalog` | Add the base catalog (idempotent, never deletes) |
+| `npm run seed:demo` | Add the realistic demo dataset |
 
-## Project Structure
+---
 
-```
-babynest/
-├── app/                 # Next.js App Router
-│   ├── (shop)/          # Storefront pages (products, cart, checkout, orders, wishlist, search…)
-│   ├── (account)/       # Login, register and account pages
-│   ├── admin/           # Admin pages
-│   └── api/             # API routes (customer, admin, AI, auth)
-├── components/          # Reusable UI, grouped by area (admin, shop, account, checkout, ai…)
-├── lib/                 # DB connection, API helpers, validation, AI, API clients
-├── models/              # Mongoose models (24 entities)
-├── scripts/             # Seed scripts (admin, catalog, demo)
-├── public/              # Static assets
-├── auth.ts              # Auth.js configuration
-└── proxy.ts             # Route protection for account and admin pages
-```
+# 🌱 Seed / Demo Data
 
-## Testing / Quality
+`npm run seed:demo` creates realistic, interconnected demo data: customers and an admin, addresses, extra categories/tags/products with variants and images, carts, wishlists, promotions, orders with items, payments, shipments and status history, returns, reviews, notifications and AI search/recommendation records, with dates spread over recent months so the dashboard and reports show meaningful trends.
 
-There is no automated test suite (no unit/e2e test framework) in the repository. Quality was verified with:
+* **Repeatable** – re-running rebuilds only the data it owns (demo users use the `@seed.babynest.test` email domain, orders the `ORD-SEED-` prefix, variants the `SD-` SKU prefix).
+* **Safe** – it never deletes real data and refuses to update an existing product it does not own, so non-seed catalog data is preserved.
+* **Not exposed** – it is a command-line tool only; no page or API route can run it.
+* **Demo credentials** – the demo accounts' password is defined in `scripts/seed-demo.ts` and printed when the script finishes; it is for local demo data only. Your own admin account comes from `seed:admin` and your `.env.local`.
 
-- TypeScript checking (`npx tsc --noEmit`) and ESLint (`npm run lint`), both passing
-- Manual API/integration testing of customer and admin flows against a seeded MongoDB database, including 401/403, ownership and forged-identity checks
-- Database integrity checks (references, order totals, stock, ratings, duplicates)
-- Manual customer and admin regression testing and browser smoke testing on desktop and mobile-sized viewports
+---
 
-## Known Limitations
+# 🧪 Quality Checks
 
-- Live AI responses require `ANTHROPIC_API_KEY`; without it the AI features report that they are not configured.
-- Customer notification preference toggles are local UI state and are not saved to a backend.
-- The customer Change Password / Security Settings buttons are not connected to a customer password endpoint (the admin password change in Admin Settings is implemented).
-- "Continue with Google/Apple", profile editing, and some account pages (for example Payment Methods and Account Settings) are frontend-only and not backed by the API; the Account overview's date of birth and gender are not stored.
-- The Reviews and AI Matches counters on the Account overview stay empty when no real value can be provided.
-- Admin return and promotion management are available through API endpoints only, without dedicated admin screens.
-- Cancelling an order does not restore stock, and category deletion is only blocked by products, not by child categories.
+There is no automated test suite in the repository. Quality was verified with:
 
-## Demo Flow
+* `npx tsc --noEmit` and `npx eslint .` (both passing)
+* Manual API/integration testing of customer and admin flows against a seeded database, including 401/403, ownership and forged-identity checks
+* Database integrity checks (references, order totals, stock, ratings, duplicates)
+* Manual customer and admin regression testing and browser smoke testing on desktop and mobile-sized viewports
 
-**Customer:** Login → Browse → Search / Filter → Product → Wishlist / Cart → Checkout → COD order → Orders → Review / Return → AI Smart Search
+---
 
-**Admin:** Login → Dashboard → Products → Orders → Customers → Categories → Reviews → AI Insights → Reports → Settings
+# ⚠️ Known Limitations
+
+* Live AI responses require `ANTHROPIC_API_KEY`; without it the AI features report that they are not configured.
+* Notification preference toggles are local UI state and are not saved to a backend.
+* Customer *Change Password* / *Security Settings* are not connected to a customer password endpoint (the admin password change in Admin Settings is implemented).
+* "Continue with Google/Apple", profile editing, and the Payment Methods and Account Settings pages are frontend-only; date of birth and gender are not stored.
+* The Account overview's *Reviews* and *AI Matches* counters stay empty when there is no real value to show.
+* Admin return and promotion management are API-only, without dedicated admin screens.
+* Cancelling an order does not restore stock, and category deletion is blocked only by products, not by child categories.
+* Some `lib/mock/` files remain for the frontend-only screens above.
+
+---
+
+# 🎓 Project Purpose
+
+BabyNest was developed as a Full Stack Development capstone project to demonstrate practical skills in frontend and backend development, database design, REST API development, authentication and authorization, responsive UI design, e-commerce architecture, AI integration, and Git/GitHub project organization.
+
+---
+
+# 👩‍💻 Developer
+
+**Manar Hussein Sayyah**
+
+Master's Degree in Information Technology and Information Systems
+Lebanese University — Faculty of Technology
+
+### Links
+
+* GitHub: https://github.com/manarsayyah
+* LinkedIn: https://linkedin.com/in/manar-sayyah
+
+---
+
+# 📄 License
+
+This project was developed for educational and academic purposes as a Full Stack Development capstone project.
+
+© 2026 Manar Hussein Sayyah — BabyNest
