@@ -3,10 +3,9 @@ import type { ApiProductImage } from "@/lib/api-client/types"
 /**
  * Neutral placeholder shown only when a product genuinely has no
  * ProductImage rows yet — a missing-asset fallback, not fabricated product
- * content, using the same placehold.co convention the project's existing
- * mock data already used.
+ * content. Stored locally (public/products/placeholders) so it works offline.
  */
-export const PLACEHOLDER_PRODUCT_IMAGE = "https://placehold.co/500x500/F5F1EA/2B2320?font=roboto&text=No+Image"
+export const PLACEHOLDER_PRODUCT_IMAGE = "/products/placeholders/no-image.svg"
 
 /** Only the fields these helpers actually need — callers don't have to supply a full ApiProductImage (e.g. with `_id`/`productId`). */
 export type ImageLike = Pick<ApiProductImage, "imageUrl" | "displayOrder" | "isPrimary"> & {
