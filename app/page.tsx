@@ -4,7 +4,8 @@ import { FeaturedProducts } from "@/components/home/featured-products"
 import { AISearchSection } from "@/components/home/ai-search-section"
 import { RecommendationsSection } from "@/components/home/recommendations-section"
 import { TrustSection } from "@/components/home/trust-section"
-import { NewsletterSection } from "@/components/home/newsletter-section"
+import { NewArrivalsSection } from "@/components/home/new-arrivals-section"
+import { FinalCtaSection } from "@/components/home/final-cta-section"
 
 export default function Home() {
   return (
@@ -15,7 +16,8 @@ export default function Home() {
       <AISearchSection />
       <RecommendationsSection />
       <TrustSection />
-      <NewsletterSection />
+      <NewArrivalsSection />
+      <FinalCtaSection />
     </main>
   )
 }

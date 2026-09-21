@@ -1,31 +1,31 @@
-import { BadgeCheck, RotateCcw, ShieldCheck, Truck } from "lucide-react"
+import { BadgeCheck, HandCoins, HeartHandshake, Sparkles } from "lucide-react"
 import { Container } from "@/components/layout/container"
 import { TrustStrip, type TrustStripItem } from "@/components/layout/trust-strip"
 
 const benefits: TrustStripItem[] = [
   {
-    icon: Truck,
-    title: "Fast Delivery",
-    description: "Free shipping on orders over $50, delivered in 2-4 days.",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Secure Payment",
-    description: "Your payment details are always encrypted and protected.",
-  },
-  {
     icon: BadgeCheck,
-    title: "Trusted Products",
-    description: "Every item is safety-tested and pediatrician-reviewed.",
+    title: "Carefully Selected Products",
+    description: "A focused catalog of baby essentials, chosen with care.",
   },
   {
-    icon: RotateCcw,
-    title: "Easy Returns",
-    description: "30-day hassle-free returns on unused, unopened items.",
+    icon: HeartHandshake,
+    title: "Safe & Trusted Choices",
+    description: "Gentle materials and everyday items parents rely on.",
+  },
+  {
+    icon: HandCoins,
+    title: "Cash on Delivery",
+    description: "Pay when your order arrives — no card needed at checkout.",
+  },
+  {
+    icon: Sparkles,
+    title: "Personalized Shopping",
+    description: "Smart search and recommendations tailored to your baby.",
   },
 ]
 
-/** Trust/benefits strip — fast delivery, secure payment, trusted products, easy returns. */
+/** Value-proposition strip — only claims BabyNest supports (Cash on Delivery is the checkout method). */
 function TrustSection() {
   return (
     <section className="section-y">

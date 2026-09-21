@@ -14,16 +14,16 @@ import { useWishlist } from "@/components/providers/wishlist-provider"
 import { fetchProducts } from "@/lib/api-client/products"
 import { PLACEHOLDER_PRODUCT_IMAGE } from "@/lib/api-client/image"
 import type { ApiProduct } from "@/lib/api-client/types"
+import { pickTopRated } from "@/components/home/product-picks"
 
 const FEATURED_COUNT = 4
 // The catalog has no "featured" flag, so the pick is derived from existing data: fetch the top-rated active
-// products (GET /api/products already excludes inactive/deleted ones) and order them deterministically.
+// products (GET /api/products already excludes inactive/deleted ones), then rank by a review-weighted rating
+// and prefer products with real photos (see product-picks.ts).
 const CANDIDATE_POOL = 50
 
 function pickFeatured(products: ApiProduct[]): ApiProduct[] {
-  return [...products]
-    .sort((a, b) => b.rating - a.rating || b.reviewCount - a.reviewCount || a.name.localeCompare(b.name))
-    .slice(0, FEATURED_COUNT)
+  return pickTopRated(products, FEATURED_COUNT)
 }
 
 /** Featured Products grid — the highest-rated active products from the real catalog. */
@@ -60,8 +60,8 @@ function FeaturedProducts() {
     <section className="section-y">
       <Container className="flex flex-col gap-8">
         <SectionHeader
-          title="Featured Products"
-          description="Parent-loved picks, refreshed every week."
+          title="Top-Rated Favorites"
+          description="Our highest-rated products, straight from the BabyNest catalog."
           action={{ href: "/products", label: "View all" }}
         />
         {failed ? (
