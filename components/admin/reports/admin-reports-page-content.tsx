@@ -176,7 +176,7 @@ function AdminReportsPageContent() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
-          <h1 className="text-h1 text-foreground">Reports</h1>
+          <h1 className="text-admin-title text-foreground">Reports</h1>
           <p className="text-body text-muted-foreground">Analyze your store performance and generate detailed reports</p>
         </div>
         <Button variant="outline" onClick={handleExport} disabled={!data || isFetching} className="w-full sm:w-auto">

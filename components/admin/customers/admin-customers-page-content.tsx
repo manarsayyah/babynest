@@ -187,7 +187,7 @@ function AdminCustomersPageContent() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-h1 text-foreground">Customers</h1>
+        <h1 className="text-admin-title text-foreground">Customers</h1>
         <p className="text-body text-muted-foreground">Manage and view your BabyNest customers</p>
       </div>
 

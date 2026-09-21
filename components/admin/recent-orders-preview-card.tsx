@@ -32,7 +32,7 @@ function RecentOrdersPreviewCard({ orders }: { orders: AdminDashboardData["recen
           <table className="w-full min-w-[640px] border-collapse text-small">
             <thead>
               <tr className="border-b border-border text-caption font-semibold tracking-wide text-muted-foreground uppercase">
-                <th className="px-2 py-2 text-left">Order ID</th>
+                <th className="px-2 py-2 text-left whitespace-nowrap">Order ID</th>
                 <th className="px-2 py-2 text-left">Customer</th>
                 <th className="px-2 py-2 text-left">Product</th>
                 <th className="px-2 py-2 text-left">Amount</th>
@@ -51,14 +51,14 @@ function RecentOrdersPreviewCard({ orders }: { orders: AdminDashboardData["recen
               ) : null}
               {orders.map((order) => (
                 <tr key={order.id} className="border-b border-border last:border-0">
-                  <td className="px-2 py-3 font-medium text-foreground">{order.orderNumber}</td>
+                  <td className="px-2 py-3 font-medium whitespace-nowrap text-foreground">{order.orderNumber}</td>
                   <td className="px-2 py-3 text-foreground">{order.customer}</td>
-                  <td className="max-w-48 truncate px-2 py-3 text-muted-foreground">{order.product}</td>
+                  <td className="max-w-36 truncate px-2 py-3 text-muted-foreground">{order.product}</td>
                   <td className="px-2 py-3 font-medium text-foreground">{formatPrice(order.amount)}</td>
                   <td className="px-2 py-3">
                     <Badge variant={statusVariant[order.status]}>{orderStatusLabel[order.status]}</Badge>
                   </td>
-                  <td className="px-2 py-3 text-muted-foreground">{shortDate(order.createdAt)}</td>
+                  <td className="px-2 py-3 whitespace-nowrap text-muted-foreground">{shortDate(order.createdAt)}</td>
                   <td className="px-2 py-3 text-right">
                     <Link
                       href="/admin/orders"

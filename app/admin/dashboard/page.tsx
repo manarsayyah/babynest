@@ -14,7 +14,7 @@ export default function AdminDashboardPage() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-h1 text-foreground">Good morning, Admin</h1>
+        <h1 className="text-admin-title text-foreground">Good morning, Admin</h1>
         <p className="text-body text-muted-foreground">
           Here&apos;s what&apos;s happening with your BabyNest store today.
         </p>

@@ -180,7 +180,7 @@ function OrderDetailContent({ orderId }: { orderId: string }) {
 
   return (
     <main className="flex-1">
-      <Container className="section-y flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
+      <Container className="account-y flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
         <AccountSidebar profile={initialProfile} className="lg:sticky lg:top-20 lg:w-72 lg:shrink-0" />
 
         <div className="flex min-w-0 flex-1 flex-col gap-6">
@@ -197,7 +197,7 @@ function OrderDetailContent({ orderId }: { orderId: string }) {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div className="flex flex-col gap-2">
                 <div className="flex flex-wrap items-center gap-3">
-                  <h1 className="text-h1 text-foreground">Order {order.id}</h1>
+                  <h1 className="text-account-title text-foreground">Order {order.id}</h1>
                   <OrderStatusBadge status={order.status} />
                 </div>
                 <p className="text-body text-muted-foreground">Placed on {order.date}</p>
@@ -233,7 +233,7 @@ function OrderDetailContent({ orderId }: { orderId: string }) {
                 </Card>
               ) : (
                 <Card className="p-5 sm:p-6">
-                  <h2 className="text-h3 text-foreground">Order Status</h2>
+                  <h2 className="font-heading text-base leading-snug font-medium text-foreground">Order Status</h2>
                   <div className="mt-5">
                     <OrderProgressTracker status={order.status} />
                   </div>
@@ -254,7 +254,7 @@ function OrderDetailContent({ orderId }: { orderId: string }) {
                   {order.items.map((item) => (
                     <div
                       key={`${item.product.id}-${item.variantId ?? ""}`}
-                      className="flex flex-col gap-3 py-4 first:pt-0 last:pb-0 sm:flex-row sm:items-center"
+                      className="flex flex-col gap-3 py-4 first:pt-0 last:pb-0 sm:flex-row sm:flex-wrap sm:items-center"
                     >
                       <Link
                         href={`/products/${item.product.slug}`}
@@ -268,7 +268,7 @@ function OrderDetailContent({ orderId }: { orderId: string }) {
                         />
                       </Link>
 
-                      <div className="flex flex-1 flex-col gap-1">
+                      <div className="flex min-w-0 flex-1 flex-col gap-1 sm:basis-40">
                         <Link
                           href={`/products/${item.product.slug}`}
                           className="text-small font-semibold text-foreground hover:text-primary"
@@ -290,7 +290,7 @@ function OrderDetailContent({ orderId }: { orderId: string }) {
                         </span>
                       </div>
 
-                      <div className="flex shrink-0 gap-2">
+                      <div className="flex shrink-0 gap-2 sm:basis-full sm:pl-[calc(4rem+0.75rem)]">
                         <Button
                           variant="outline"
                           size="sm"

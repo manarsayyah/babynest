@@ -116,7 +116,7 @@ function OrdersPageContent() {
 
   return (
     <main className="flex-1">
-      <Container className="section-y flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
+      <Container className="account-y flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
         <AccountSidebar profile={initialProfile} className="lg:sticky lg:top-20 lg:w-72 lg:shrink-0" />
 
         <div className="flex min-w-0 flex-1 flex-col gap-6">
@@ -125,7 +125,7 @@ function OrdersPageContent() {
               items={[{ label: "Home", href: "/" }, { label: "My Account", href: "/account" }, { label: "Orders" }]}
             />
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-h1 text-foreground">My Orders</h1>
+              <h1 className="text-account-title text-foreground">My Orders</h1>
               <Badge variant="secondary">{orderList.length} Orders</Badge>
             </div>
             <p className="text-body text-muted-foreground">

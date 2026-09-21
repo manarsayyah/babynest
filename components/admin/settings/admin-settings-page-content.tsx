@@ -54,7 +54,7 @@ function AdminSettingsPageContent() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-h1 text-foreground">Settings</h1>
+        <h1 className="text-admin-title text-foreground">Settings</h1>
         <p className="text-body text-muted-foreground">Manage your BabyNest store and admin preferences</p>
       </div>
 

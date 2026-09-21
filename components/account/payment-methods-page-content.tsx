@@ -15,7 +15,7 @@ import { initialProfile } from "@/lib/mock/account"
 function PaymentMethodsPageContent() {
   return (
     <main className="flex-1">
-      <Container className="section-y flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
+      <Container className="account-y flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
         <AccountSidebar profile={initialProfile} className="lg:sticky lg:top-20 lg:w-72 lg:shrink-0" />
 
         <div className="flex min-w-0 flex-1 flex-col gap-6">
@@ -27,7 +27,7 @@ function PaymentMethodsPageContent() {
                 { label: "Payment Methods" },
               ]}
             />
-            <h1 className="text-h1 text-foreground">Payment Methods</h1>
+            <h1 className="text-account-title text-foreground">Payment Methods</h1>
             <p className="text-body text-muted-foreground">Manage how you pay for your BabyNest orders.</p>
           </div>
 

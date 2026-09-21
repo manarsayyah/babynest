@@ -101,13 +101,13 @@ function WishlistPageContent() {
 
   return (
     <main className="flex-1">
-      <Container className="section-y flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
+      <Container className="account-y flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
         <AccountSidebar profile={initialProfile} className="lg:sticky lg:top-20 lg:w-72 lg:shrink-0" />
 
         <div className="flex min-w-0 flex-1 flex-col gap-6">
           <div className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex flex-col gap-2">
-              <h1 className="flex items-center gap-2 text-h1 text-foreground">
+              <h1 className="flex items-center gap-2 text-account-title text-foreground">
                 My Wishlist
                 <Heart className="size-6 fill-primary text-primary" />
               </h1>

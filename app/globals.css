@@ -251,6 +251,21 @@
   letter-spacing: -0.015em;
 }
 
+/* Page titles inside the signed-in Customer account and Admin areas — one step below the storefront text-h1. */
+@utility text-account-title {
+  font-size: clamp(1.5rem, 1.35rem + 0.6vw, 1.875rem);
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+@utility text-admin-title {
+  font-size: clamp(1.375rem, 1.25rem + 0.5vw, 1.75rem);
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
 @utility text-h2 {
   font-size: clamp(1.5rem, 1.35rem + 0.7vw, 2.25rem);
   line-height: 1.2;
@@ -312,6 +327,17 @@
   }
   @variant lg {
     padding-inline: 2rem;
+  }
+}
+
+/* Tighter vertical padding for the Customer account layouts (sidebar + content). */
+@utility account-y {
+  padding-block: 1.5rem;
+  @variant md {
+    padding-block: 2rem;
+  }
+  @variant lg {
+    padding-block: 2.5rem;
   }
 }
 

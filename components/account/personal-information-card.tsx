@@ -1,6 +1,7 @@
 "use client"
 
 import { toast } from "sonner"
+import { cn } from "cn"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import type { AccountProfile } from "@/lib/mock/account"
@@ -9,9 +10,9 @@ export type PersonalInformationCardProps = {
   profile: AccountProfile
 }
 
-function Field({ label, value }: { label: string; value: string }) {
+function Field({ label, value, className }: { label: string; value: string; className?: string }) {
   return (
-    <div className="flex min-w-0 flex-col gap-0.5">
+    <div className={cn("flex min-w-0 flex-col gap-0.5", className)}>
       <span className="text-caption text-muted-foreground">{label}</span>
       <span className="break-words text-small font-medium text-foreground">{value || "—"}</span>
     </div>
@@ -40,7 +41,7 @@ function PersonalInformationCard({ profile }: PersonalInformationCardProps) {
           <div className="grid min-w-0 flex-1 grid-cols-2 gap-x-4 gap-y-3">
             <Field label="First Name" value={profile.firstName} />
             <Field label="Last Name" value={profile.lastName} />
-            <Field label="Email" value={profile.email} />
+            <Field label="Email" value={profile.email} className="col-span-2" />
             <Field label="Date of Birth" value={profile.dateOfBirth} />
             <Field label="Phone" value={profile.phone} />
             <Field label="Gender" value={profile.gender} />

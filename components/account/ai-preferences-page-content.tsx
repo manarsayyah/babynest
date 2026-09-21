@@ -99,7 +99,7 @@ function AIPreferencesPageContent() {
 
   return (
     <main className="flex-1">
-      <Container className="section-y flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
+      <Container className="account-y flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
         <AccountSidebar profile={initialProfile} className="lg:sticky lg:top-20 lg:w-72 lg:shrink-0" />
 
         <div className="flex min-w-0 flex-1 flex-col gap-6">
@@ -111,7 +111,7 @@ function AIPreferencesPageContent() {
                 { label: "AI Preferences" },
               ]}
             />
-            <h1 className="flex items-center gap-2 text-h1 text-foreground">
+            <h1 className="flex items-center gap-2 text-account-title text-foreground">
               AI Preferences
               <Sparkles className="size-6 text-ai" />
             </h1>

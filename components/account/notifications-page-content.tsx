@@ -69,7 +69,7 @@ function NotificationsPageContent() {
 
   return (
     <main className="flex-1">
-      <Container className="section-y flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
+      <Container className="account-y flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
         <AccountSidebar profile={initialProfile} className="lg:sticky lg:top-20 lg:w-72 lg:shrink-0" />
 
         <div className="flex min-w-0 flex-1 flex-col gap-6">
@@ -81,7 +81,7 @@ function NotificationsPageContent() {
                 { label: "Notifications" },
               ]}
             />
-            <h1 className="text-h1 text-foreground">Notifications</h1>
+            <h1 className="text-account-title text-foreground">Notifications</h1>
             <p className="text-body text-muted-foreground">
               Control which notifications you receive from BabyNest.
             </p>

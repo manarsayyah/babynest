@@ -11,7 +11,7 @@ function ReturnsRefundsCard({ onStartReturn }: { onStartReturn: () => void }) {
           <RotateCcw className="size-[18px]" />
         </span>
         <div>
-          <h2 className="text-h3 text-foreground">Returns & Refunds</h2>
+          <h2 className="font-heading text-base leading-snug font-medium text-foreground">Returns & Refunds</h2>
           <p className="text-small text-muted-foreground">
             Eligible items can be returned within 30 days of delivery.
           </p>

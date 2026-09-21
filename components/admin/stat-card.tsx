@@ -31,7 +31,7 @@ function StatCard({
   className,
 }: StatCardProps) {
   return (
-    <Card className={cn("flex-row items-center gap-3 p-3.5", className)}>
+    <Card className={cn("flex-row items-center gap-2.5 p-3 sm:gap-3 sm:p-3.5", className)}>
       <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-full", toneClasses[tone])}>
         <Icon className="size-4" />
       </span>
@@ -41,14 +41,14 @@ function StatCard({
         {trendLabel ? (
           <span
             className={cn(
-              "flex items-center gap-1 truncate text-caption",
+              "text-caption leading-snug text-balance",
               trendDirection === "up" ? "text-success" : "text-destructive"
             )}
           >
             {trendDirection === "up" ? (
-              <ArrowUpRight className="size-3 shrink-0" />
+              <ArrowUpRight className="mr-1 inline size-3 align-[-1px]" />
             ) : (
-              <ArrowDownRight className="size-3 shrink-0" />
+              <ArrowDownRight className="mr-1 inline size-3 align-[-1px]" />
             )}
             {trendLabel}
           </span>

@@ -44,7 +44,7 @@ function AIPreferencesCard({ tags, matchPercent, newMatchesCount, onUpdatePrefer
     <AIPanel className="p-5 sm:p-6">
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="flex items-center gap-1.5 text-h3 text-foreground">
+          <h2 className="flex items-center gap-1.5 font-heading text-base leading-snug font-medium text-foreground">
             Your BabyNest AI
             <Sparkles className="size-4 text-ai" />
           </h2>

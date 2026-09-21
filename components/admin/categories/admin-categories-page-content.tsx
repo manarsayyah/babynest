@@ -212,7 +212,7 @@ function AdminCategoriesPageContent() {
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-col gap-1">
-          <h1 className="text-h1 text-foreground">Categories</h1>
+          <h1 className="text-admin-title text-foreground">Categories</h1>
           <p className="text-body text-muted-foreground">Organize and manage your BabyNest product categories</p>
         </div>
         <Button onClick={() => setFormState({ mode: "add" })} className="w-full sm:w-auto">
