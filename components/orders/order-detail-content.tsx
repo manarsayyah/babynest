@@ -26,6 +26,7 @@ import { useCart } from "@/components/providers/cart-provider"
 import { OrderReturnsCard } from "@/components/orders/order-returns-card"
 import { fetchOrder, type Order } from "@/lib/api-client/orders"
 import { cancelReturn, fetchOrderReturns, type ReturnRecord } from "@/lib/api-client/returns"
+import { downloadInvoice } from "@/lib/api-client/invoice"
 import { ApiRequestError } from "@/lib/api-client/fetcher"
 import { initialProfile } from "@/lib/mock/account"
 
@@ -58,6 +59,7 @@ function OrderDetailContent({ orderId }: { orderId: string }) {
   const [returnsError, setReturnsError] = React.useState<string | null>(null)
   const [returnsToken, setReturnsToken] = React.useState(0)
   const [cancellingReturnId, setCancellingReturnId] = React.useState<string | null>(null)
+  const [isDownloadingInvoice, setIsDownloadingInvoice] = React.useState(false)
 
   React.useEffect(() => {
     let cancelled = false
@@ -153,8 +155,22 @@ function OrderDetailContent({ orderId }: { orderId: string }) {
     if (order) void buyAgain(order.items)
   }
 
-  function handleDownloadInvoice() {
-    toast("Invoice downloads aren't available yet")
+  async function handleDownloadInvoice() {
+    // Guards both buttons that call this (the header action and the Billing Information card) against
+    // overlapping requests, even though only the header button below reflects the loading state visually.
+    if (!order || isDownloadingInvoice) return
+    setIsDownloadingInvoice(true)
+    try {
+      await downloadInvoice(order.routeId, order.id)
+    } catch (err) {
+      toast.error(
+        err instanceof ApiRequestError && err.status < 500
+          ? err.message
+          : "Couldn't download the invoice. Please try again."
+      )
+    } finally {
+      setIsDownloadingInvoice(false)
+    }
   }
 
   function handleNeedHelp() {
@@ -208,9 +224,9 @@ function OrderDetailContent({ orderId }: { orderId: string }) {
                   <ShoppingCart data-icon="inline-start" />
                   Buy Again
                 </Button>
-                <Button variant="secondary" onClick={handleDownloadInvoice}>
+                <Button variant="secondary" onClick={() => void handleDownloadInvoice()} disabled={isDownloadingInvoice}>
                   <Download data-icon="inline-start" />
-                  Download Invoice
+                  {isDownloadingInvoice ? "Downloading..." : "Download Invoice"}
                 </Button>
                 <Button variant="outline" onClick={handleNeedHelp}>
                   <CircleHelp data-icon="inline-start" />
@@ -384,7 +400,7 @@ function OrderDetailContent({ orderId }: { orderId: string }) {
                 name={order.shippingName}
                 addressLine1={order.shippingLine1}
                 city={order.shippingCity}
-                onDownloadInvoice={handleDownloadInvoice}
+                onDownloadInvoice={() => void handleDownloadInvoice()}
               />
 
               <DeliverySupportCard
