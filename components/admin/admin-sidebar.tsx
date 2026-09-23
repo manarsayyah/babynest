@@ -13,6 +13,8 @@ import {
   ShoppingBag,
   Sparkles,
   Star,
+  Tag,
+  Undo2,
   Users,
   FolderTree,
 } from "lucide-react"
@@ -21,7 +23,9 @@ import { cn } from "cn"
 const navItems = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/products", label: "Products", icon: Package },
+  { href: "/admin/promotions", label: "Promotions", icon: Tag },
   { href: "/admin/orders", label: "Orders", icon: ShoppingBag },
+  { href: "/admin/returns", label: "Returns", icon: Undo2 },
   { href: "/admin/customers", label: "Customers", icon: Users },
   { href: "/admin/categories", label: "Categories", icon: FolderTree },
   { href: "/admin/reviews", label: "Reviews", icon: Star },
