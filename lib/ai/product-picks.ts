@@ -11,7 +11,7 @@ export class AiServiceError extends Error {
   }
 }
 
-const REQUEST_TIMEOUT_MS = 30000
+const REQUEST_TIMEOUT_MS = 15000
 
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
   return new Promise((resolve, reject) => {
